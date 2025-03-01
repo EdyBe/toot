@@ -180,10 +180,55 @@ async function uploadVideo(videoData) {
             }
         });
 
+        // Store video metadata in Supabase
+        await storeVideoMetadata({
+            videoId: uploadResult.id,
+            schoolName: videoData.schoolName,
+            classCode: videoData.classCode,
+            title: videoData.title,
+            subject: videoData.subject,
+            userId: videoData.userId // Include user ID here
+        });
+
         return uploadResult;
     } catch (error) {
         throw new Error('Failed to upload video: ' + error.message);
     }
 }
 
-module.exports = { createUser, readUser, updateUser, deleteUser, uploadVideo };
+// Function to store video metadata in Supabase
+async function storeVideoMetadata(videoData) {
+    const { data, error } = await supabase
+        .from('videos')
+        .insert([{
+            video_id: videoData.videoId,
+            school_name: videoData.schoolName,
+            class_code: videoData.classCode,
+            title: videoData.title,
+            subject: videoData.subject,
+            user_id: videoData.userId // Include user ID here
+        }]);
+
+    if (error) {
+        throw new Error('Failed to store video metadata: ' + error.message);
+    }
+
+    return data[0];
+}
+
+// Function to retrieve videos for a teacher
+async function getVideosForTeacher(schoolName, classCode) {
+    const { data, error } = await supabase
+        .from('videos')
+        .select('*')
+        .eq('school_name', schoolName)
+        .eq('class_code', classCode);
+
+    if (error) {
+        throw new Error('Failed to retrieve videos: ' + error.message);
+    }
+
+    return data; // This will return an array of video metadata
+}
+
+module.exports = { createUser, readUser, updateUser, deleteUser, uploadVideo, storeVideoMetadata, getVideosForTeacher };
