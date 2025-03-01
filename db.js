@@ -82,8 +82,32 @@ async function readUser(email) {
         throw new Error('User not found: ' + error.message);
     }
 
-    // Fetch videos associated with the user from Cloudflare Stream
-    const videos = await cloudflareStream.getVideos({ userId: data.id });
+    let videosData;
+    let videosError;
+
+    if (data.accountType === 'student') {
+        // Fetch videos associated with the student
+        ({ data: videosData, error: videosError } = await supabase
+            .from('videos')
+            .select('*')
+            .eq('user_id', data.id));
+    } else if (data.accountType === 'teacher') {
+        // Fetch videos associated with the teacher based on school name and class code
+        ({ data: videosData, error: videosError } = await supabase
+            .from('videos')
+            .select('*')
+            .eq('school_name', data.school_name) // Assuming school_name is part of user data
+            .eq('class_code', data.class_code)); // Assuming class_code is part of user data
+    }
+
+    if (videosError) {
+        throw new Error('Error fetching videos: ' + videosError.message);
+    }
+
+    const videos = videosData.map(video => ({
+        videoUid: video.video_id, // Assuming video_id is the UID
+        accountId: process.env.CLOUDFLARE_ACCOUNT_ID // Use the account ID from environment variables
+    }));
 
     return { user: data, videos };
 }
