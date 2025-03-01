@@ -10,10 +10,12 @@ const {
 } = require('./emailService'); // Email service functions for password reset
 const multer = require('multer'); // Middleware for handling file uploads
 const { Server } = require('@tus/server'); // Import TUS server
+const { Storage } = require('@fixers/cloudflare-stream'); // Import Cloudflare Stream
+const { createClient } = require('@supabase/supabase-js'); // Import Supabase client
+const path = require('path'); // Path module for file path operations
 
 // Database related imports
 const { uploadVideo, createUser, updateUser, readUser } = require('./db');
-const path = require('path'); // Path module for file path operations
 const cors = require('cors'); // CORS middleware for cross-origin requests
 
 // Initialize Express application
@@ -51,7 +53,10 @@ const upload = multer({
 // TUS Server Configuration
 const tusServer = new Server({
     path: '/files', // TUS endpoint
-    uploadDir: './uploads', // Directory to store uploads
+    datastore: new Storage({
+        accountId: process.env.CLOUDFLARE_ACCOUNT_ID, // Cloudflare Account ID from environment variables
+        apiKey: process.env.CLOUDFLARE_API_KEY // Cloudflare API Key from environment variables
+    }),
     onError: (error, req, res) => {
         console.error('Error during TUS upload:', error);
         res.status(500).send('Internal Server Error');
@@ -60,6 +65,11 @@ const tusServer = new Server({
 
 // Middleware to handle TUS uploads
 app.use('/files', tusServer.handle.bind(tusServer));
+
+// Initialize Supabase client
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 /**
  * Retrieves user information including first name, class codes, and school name
