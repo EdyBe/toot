@@ -1,4 +1,3 @@
-
 {
   "name": "your-project-name",
   "version": "1.0.0",
@@ -19,8 +18,7 @@
     "tus-node-server": "^0.9.0",
     "@supabase/supabase-js": "^1.0.0",
     "axios": "^0.21.1",
-    "@tus/server": "^0.9.0", // Adding the missing dependency
-    "@cloudflare/stream": "^1.0.0" // Adding the missing dependency
+    "@tus/server": "^0.9.0",
+    "@cloudflare/stream": "^1.0.0"
   }
 }
-
