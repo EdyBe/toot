@@ -1,5 +1,4 @@
 const { createClient } = require('@supabase/supabase-js'); // Import Supabase client
-const { Storage } = require('@fixers/cloudflare-stream'); // Import Cloudflare Stream
 
 // Supabase Configuration
 const supabaseUrl = process.env.SUPABASE_URL; // Supabase URL from environment variables
