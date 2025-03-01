@@ -5,12 +5,6 @@ const supabaseUrl = process.env.SUPABASE_URL; // Supabase URL from environment v
 const supabaseKey = process.env.SUPABASE_KEY; // Supabase Key from environment variables
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-// Cloudflare Stream Configuration
-const cloudflareStream = new Storage({
-    accountId: process.env.CLOUDFLARE_ACCOUNT_ID, // Cloudflare Account ID from environment variables
-    apiKey: process.env.CLOUDFLARE_API_KEY // Cloudflare API Key from environment variables
-});
-
 // License Key Management System
 const licenseKeyLimits = {
     "BurnsideHighSchool": 4,
