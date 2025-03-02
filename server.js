@@ -9,8 +9,8 @@ const {
     deleteResetToken 
 } = require('./emailService'); // Email service functions for password reset
 const multer = require('multer'); // Middleware for handling file uploads
+const axios = require('axios'); // Import Axios for making HTTP requests
 const { Server } = require('@tus/server'); // Import TUS server
-const { CloudflareStream } = require('@fixers/cloudflare-stream'); // Import Cloudflare Stream
 const { createClient } = require('@supabase/supabase-js'); // Import Supabase client
 const path = require('path'); // Path module for file path operations
 
@@ -50,6 +50,12 @@ const upload = multer({
     }
 });
 
+// Initialize Supabase client
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
+
+
 // Initialize Cloudflare Stream
 const cloudflareStream = new CloudflareStream({
     accountId: process.env.CLOUDFLARE_ACCOUNT_ID, // Cloudflare Account ID from environment variables
@@ -68,10 +74,7 @@ const tusServer = new Server({
 // Middleware to handle TUS uploads
 app.use('/files', tusServer.handle.bind(tusServer));
 
-// Initialize Supabase client
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
+
 
 
 /**
@@ -102,6 +105,42 @@ app.get('/user-info', async (req, res) => {
     } catch (error) {
         console.error('Error fetching user info:', error);
         res.status(500).json({ message: 'Failed to fetch user info' });
+    }
+});
+
+// Function to upload video to Cloudflare Stream
+async function uploadVideoToCloudflare(videoData) {
+    const url = `https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/stream`;
+    const headers = {
+        'Authorization': `Bearer ${process.env.CLOUDFLARE_API_KEY}`,
+        'Content-Type': 'application/json'
+    };
+
+    const response = await axios.post(url, {
+        file: videoData.buffer,
+        // Add other metadata as needed
+    }, { headers });
+
+    return response.data;
+}
+
+// Video Upload Endpoint
+app.post('/upload', upload.single('video'), async (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ message: 'No video file uploaded' });
+    }
+
+    try {
+        const videoData = {
+            buffer: req.file.buffer,
+            // Include other metadata as needed
+        };
+
+        const uploadResponse = await uploadVideoToCloudflare(videoData);
+        res.status(200).json({ message: 'Video uploaded successfully', data: uploadResponse });
+    } catch (error) {
+        console.error('Video upload error:', error);
+        res.status(500).json({ message: 'Failed to upload video', error: error.message });
     }
 });
 
