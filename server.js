@@ -10,6 +10,7 @@ const {
 } = require('./emailService'); // Email service functions for password reset
 const multer = require('multer'); // Middleware for handling file uploads
 const { Server } = require('@tus/server'); // Import TUS server
+const { FileStore } = require('@tus/file-store'); // Import FileStore for TUS
 const axios = require('axios'); // Import Axios for making HTTP requests
 const { createClient } = require('@supabase/supabase-js'); // Import Supabase client
 const path = require('path'); // Path module for file path operations
@@ -94,6 +95,9 @@ app.post('/upload', upload.single('video'), async (req, res) => {
 // TUS Server Configuration
 const tusServer = new Server({
     path: '/files', // TUS endpoint
+    datastore: new FileStore({
+        directory: './uploads' // Directory to store uploads
+    }),
     onError: (error, req, res) => {
         console.error('Error during TUS upload:', error);
         res.status(500).send('Internal Server Error');
