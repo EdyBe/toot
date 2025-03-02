@@ -9,6 +9,7 @@ const {
     deleteResetToken 
 } = require('./emailService'); // Email service functions for password reset
 const multer = require('multer'); // Middleware for handling file uploads
+const { Server } = require('@tus/server'); // Import TUS server
 const axios = require('axios'); // Import Axios for making HTTP requests
 const { createClient } = require('@supabase/supabase-js'); // Import Supabase client
 const path = require('path'); // Path module for file path operations
@@ -90,6 +91,18 @@ app.post('/upload', upload.single('video'), async (req, res) => {
     }
 });
 
+// TUS Server Configuration
+const tusServer = new Server({
+    path: '/files', // TUS endpoint
+    onError: (error, req, res) => {
+        console.error('Error during TUS upload:', error);
+        res.status(500).send('Internal Server Error');
+    },
+});
+
+// Middleware to handle TUS uploads
+app.use('/files', tusServer.handle.bind(tusServer));
+
 // Existing user info retrieval endpoint
 app.get('/user-info', async (req, res) => {
     try {
@@ -116,21 +129,6 @@ app.get('/user-info', async (req, res) => {
         res.status(500).json({ message: 'Failed to fetch user info' });
     }
 });
-
-
-// TUS Server Configuration
-const tusServer = new Server({
-    path: '/files', // TUS endpoint
-    onError: (error, req, res) => {
-        console.error('Error during TUS upload:', error);
-        res.status(500).send('Internal Server Error');
-    },
-});
-
-// Middleware to handle TUS uploads
-app.use('/files', tusServer.handle.bind(tusServer));
-
-
 
 
 /**
