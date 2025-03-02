@@ -21,7 +21,7 @@ const cors = require('cors'); // CORS middleware for cross-origin requests
 
 // Initialize Express application
 const app = express();
-const port = 3000; // Server port
+const port = 10000; // Server port
 
 // Security and database modules
 const bcrypt = require('bcrypt'); // For password hashing
