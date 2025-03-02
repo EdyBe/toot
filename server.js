@@ -134,7 +134,6 @@ app.get('/user-info', async (req, res) => {
     }
 });
 
-
 /**
  * Retrieves user information including first name, class codes, and school name
  * @param {string} email - User's email address (query parameter)
