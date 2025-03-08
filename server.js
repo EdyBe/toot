@@ -78,7 +78,7 @@ app.post('/sign-in', async (req, res) => {
         const { email, password } = req.body;
 
         // Find user by email
-        const user = users.find(u => u.email === email);
+        const user = user.find(u => u.email === email);
 
         if (user) {
             // Compare the provided password with the hashed password
