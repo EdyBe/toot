@@ -111,10 +111,11 @@ app.get('/class-codes', async (req, res) => {
         const { email } = req.query;
 
         // Query Supabase to find class codes associated with the user's email
-        const { data: classCodes, error } = await supabase
-            .from('class_codes')
-            .select('code')
-            .eq('student_email', email);
+        const { data: user, error } = await supabase
+            .from('users')
+            .select('classCodesArray')
+            .eq('email', email)
+            .single();
 
         if (error) {
             console.error('Error fetching class codes:', error);
