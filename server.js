@@ -73,21 +73,30 @@ async function uploadVideoToCloudflare(videoData) {
 }
 
 // Sign-in endpoint
-app.post('/sign-in', (req, res) => {
+app.post('/sign-in', async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // Find user by email and password
-        const user = users.find(u => u.email === email && u.password === password);
+        // Find user by email
+        const user = users.find(u => u.email === email);
 
         if (user) {
-            // Authentication successful
-            res.json({
-                user: { email: user.email },
-                redirectPage: user.redirectPage
-            });
+            // Compare the provided password with the hashed password
+            const match = await bcrypt.compare(password, user.password);
+            if (match) {
+                // Authentication successful
+                res.json({
+                    user: { email: user.email },
+                    redirectPage: user.redirectPage
+                });
+            } else {
+                // Authentication failed
+                res.status(401).json({
+                    message: 'Invalid email or password'
+                });
+            }
         } else {
-            // Authentication failed
+            // User not found
             res.status(401).json({
                 message: 'Invalid email or password'
             });
@@ -95,10 +104,12 @@ app.post('/sign-in', (req, res) => {
     } catch (error) {
         console.error('Error during sign-in:', error);
         res.status(500).json({
-            message: 'Internal Server Error'
+            message: 'Internal Server Error',
+            error: error.message // Include the error message in the response for debugging
         });
     }
 });
+
 
 // Video Upload Endpoint
 app.post('/upload', upload.single('video'), async (req, res) => {
