@@ -21,7 +21,7 @@ const cors = require('cors'); // CORS middleware for cross-origin requests
 
 // Initialize Express application
 const app = express();
-const port = 10000; // Server port
+const port = 3000; // Server port
 
 // Security and database modules
 const bcrypt = require('bcrypt'); // For password hashing
@@ -56,6 +56,9 @@ const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+
+
+
 // Function to upload video to Cloudflare Stream
 async function uploadVideoToCloudflare(videoData) {
     const url = `https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/stream`;
@@ -72,60 +75,100 @@ async function uploadVideoToCloudflare(videoData) {
     return response.data;
 }
 
-
-
-
-// Sign-in endpoint
-app.post('/sign-in', async (req, res) => {
+/// Sign-in endpoint
+app.post('/sign-in', (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // Query Supabase to find user by email
-        const { data: user, error } = await supabase
-            .from('users')
-            .select('*')
-            .eq('email', email)
-            .single();
-
-        if (error) {
-            console.error('Error fetching user:', error);
-            return res.status(500).json({
-                message: 'Internal Server Error',
-                error: error.message
-            });
-        }
+        // Find user by email and password
+        const user = user.find(u => u.email === email && u.password === password);
 
         if (user) {
-            // Compare the provided password with the hashed password
-            const match = await bcrypt.compare(password, user.password);
-            if (match) {
-                // Determine the redirect page based on account type
-                let redirectPage = '';
-                if (user.accountType === 'student') {
-                    redirectPage = 'student-.html';
-                } else if (user.accountType === 'teacher') {
-                    redirectPage = 'teacher-.html';
-                }
-
-                // Authentication successful
-                res.json({
-                    user: { email: user.email },
-                    redirectPage: redirectPage
-                });
-            } else {
-                // Authentication failed
-                res.status(401).json({
-                    message: 'Invalid email or password'
-                });
-            }
+            // Authentication successful
+            res.json({
+                user: { email: user.email },
+                redirectPage: user.redirectPage
+            });
         } else {
-            // User not found
+            // Authentication failed
             res.status(401).json({
                 message: 'Invalid email or password'
             });
         }
     } catch (error) {
         console.error('Error during sign-in:', error);
+        res.status(500).json({
+            message: 'Internal Server Error'
+        });
+    }
+});
+
+
+
+// Fetch class codes endpoint
+app.get('/class-codes', async (req, res) => {
+    try {
+        const { email } = req.query;
+
+        // Query Supabase to find class codes associated with the user's email
+        const { data: classCodes, error } = await supabase
+            .from('class_codes')
+            .select('code')
+            .eq('student_email', email);
+
+        if (error) {
+            console.error('Error fetching class codes:', error);
+            return res.status(500).json({
+                message: 'Internal Server Error',
+                error: error.message
+            });
+        }
+
+        res.json({ classCodes });
+    } catch (error) {
+        console.error('Error fetching class codes:', error);
+        res.status(500).json({
+            message: 'Internal Server Error',
+            error: error.message // Include the error message in the response for debugging
+        });
+    }
+});
+
+// Video Upload Endpoint
+app.post('/upload', upload.single('video'), async (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ message: 'No video file uploaded' });
+    }
+
+    const { classCode, userId } = req.body;
+    const videoData = req.file;
+
+    try {
+        // Upload video to Cloudflare Stream
+        const cloudflareResponse = await uploadVideoToCloudflare(videoData);
+
+        // Store video metadata in Supabase
+        const { data, error } = await supabase
+            .from('videos')
+            .insert([
+                {
+                    video_url: cloudflareResponse.result.playback.hls,
+                    class_code: classCode,
+                    uploaded_by: userId
+                }
+            ]);
+
+        if (error) {
+            console.error('Error storing video metadata:', error);
+            return res.status(500).json({
+                message: 'Internal Server Error',
+                error: error.message
+            });
+        }
+
+        res.json({ message: 'Video uploaded successfully' });
+    } catch (error) {
+        console.error('Error uploading video:', error);
         res.status(500).json({
             message: 'Internal Server Error',
             error: error.message // Include the error message in the response for debugging
@@ -134,27 +177,6 @@ app.post('/sign-in', async (req, res) => {
 });
 
 
-
-
-// Video Upload Endpoint
-app.post('/upload', upload.single('video'), async (req, res) => {
-    if (!req.file) {
-        return res.status(400).json({ message: 'No video file uploaded' });
-    }
-
-    try {
-        const videoData = {
-            buffer: req.file.buffer,
-            // Include other metadata as needed
-        };
-
-        const uploadResponse = await uploadVideoToCloudflare(videoData);
-        res.status(200).json({ message: 'Video uploaded successfully', data: uploadResponse });
-    } catch (error) {
-        console.error('Video upload error:', error);
-        res.status(500).json({ message: 'Failed to upload video', error: error.message });
-    }
-});
 
 // TUS Server Configuration
 const tusServer = new Server({
