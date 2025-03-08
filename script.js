@@ -28,7 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-       // Handle sign-in form if it exists
+    // Handle sign-in form if it exists
 const signInForm = document.getElementById('signInForm');
 if (signInForm) {
     signInForm.addEventListener('submit', async function(event) {
@@ -45,7 +45,10 @@ if (signInForm) {
                 body: JSON.stringify({ email, password })
             });
 
-            const data = await response.json();
+            const text = await response.text(); // Read as plain text
+            console.log("Raw response:", text); // Log the raw response text
+
+            const data = JSON.parse(text); // Parse the text as JSON
             if (response.ok) {
                 // Store user email in session storage
                 sessionStorage.setItem('userEmail', data.user.email); // Store the user email in session storage
