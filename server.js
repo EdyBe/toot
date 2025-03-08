@@ -72,6 +72,27 @@ async function uploadVideoToCloudflare(videoData) {
     return response.data;
 }
 
+// Sign-in endpoint
+app.post('/sign-in', (req, res) => {
+    const { email, password } = req.body;
+
+    // Find user by email and password
+    const user = users.find(u => u.email === email && u.password === password);
+
+    if (user) {
+        // Authentication successful
+        res.json({
+            user: { email: user.email },
+            redirectPage: user.redirectPage
+        });
+    } else {
+        // Authentication failed
+        res.status(401).json({
+            message: 'Invalid email or password'
+        });
+    }
+});
+
 // Video Upload Endpoint
 app.post('/upload', upload.single('video'), async (req, res) => {
     if (!req.file) {
