@@ -73,6 +73,8 @@ async function uploadVideoToCloudflare(videoData) {
 }
 
 
+
+
 // Sign-in endpoint
 app.post('/sign-in', async (req, res) => {
     try {
@@ -97,10 +99,18 @@ app.post('/sign-in', async (req, res) => {
             // Compare the provided password with the hashed password
             const match = await bcrypt.compare(password, user.password);
             if (match) {
+                // Determine the redirect page based on account type
+                let redirectPage = '';
+                if (user.accountType === 'student') {
+                    redirectPage = 'student-.html';
+                } else if (user.accountType === 'teacher') {
+                    redirectPage = 'teacher-.html';
+                }
+
                 // Authentication successful
                 res.json({
                     user: { email: user.email },
-                    redirectPage: user.redirectPage
+                    redirectPage: redirectPage
                 });
             } else {
                 // Authentication failed
@@ -122,6 +132,7 @@ app.post('/sign-in', async (req, res) => {
         });
     }
 });
+
 
 
 
