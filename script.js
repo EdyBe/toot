@@ -44,7 +44,9 @@ document.addEventListener('DOMContentLoaded', () => {
                         },
                         body: JSON.stringify({ email, password })
                     });
-
+                    const text = await response.text(); // Read as plain text
+                    console.log("Raw response:", text);
+                    
                     const data = await response.json();
                     if (response.ok) {
                         // Store user email in session storage
