@@ -111,7 +111,7 @@ app.get('/class-codes', async (req, res) => {
         const { email } = req.query;
 
         // Query Supabase to find class codes associated with the user's email
-        const { data: user, error } = await supabase
+        const { data, error } = await supabase
             .from('users')
             .select('classCodesArray')
             .eq('email', email)
@@ -125,7 +125,15 @@ app.get('/class-codes', async (req, res) => {
             });
         }
 
-        res.json({ classCodes });
+        const user = data;
+
+        if (user && user.classCodesArray) {
+            res.json({ classCodes: user.classCodesArray });
+        } else {
+            res.status(404).json({
+                message: 'Class codes not found for the user'
+            });
+        }
     } catch (error) {
         console.error('Error fetching class codes:', error);
         res.status(500).json({
