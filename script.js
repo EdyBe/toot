@@ -28,46 +28,43 @@ document.addEventListener('DOMContentLoaded', () => {
             });
         }
 
-        // Handle sign-in form if it exists
-        const signInForm = document.getElementById('signInForm');
-        if (signInForm) {
-            signInForm.addEventListener('submit', async function(event) {
-                event.preventDefault();
-                const email = this[0].value;
-                const password = this[1].value;
+       // Handle sign-in form if it exists
+const signInForm = document.getElementById('signInForm');
+if (signInForm) {
+    signInForm.addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const email = this[0].value;
+        const password = this[1].value;
 
-              try {
-                const response = await fetch('/sign-in', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ email, password })
-                });
-                const text = await response.text(); // Read as plain text
-                console.log("Raw response:", text);    
+        try {
+            const response = await fetch('/sign-in', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email, password })
+            });
 
-
-                const data = await response.json();
-                if (response.ok) {
-                    // Store user email in session storage
-                    sessionStorage.setItem('userEmail', data.user.email); // Store the user email in session storage
-                    console.log('User email stored in session storage:', email); // Log the stored email
-                    
-                    // Redirect to the appropriate dashboard
-                    window.location.href = data.redirectPage;
-                } else {
-                    const errorMessage = document.getElementById('errorMessage');
-                    errorMessage.innerText = data.message;
-                    errorMessage.style.display = 'block'; // Show the error message
-                }
-            } catch (error) {
+            const data = await response.json();
+            if (response.ok) {
+                // Store user email in session storage
+                sessionStorage.setItem('userEmail', data.user.email); // Store the user email in session storage
+                console.log('User email stored in session storage:', email); // Log the stored email
+                
+                // Redirect to the appropriate dashboard
+                window.location.href = data.redirectPage;
+            } else {
                 const errorMessage = document.getElementById('errorMessage');
-                errorMessage.innerText = error.message;
+                errorMessage.innerText = data.message;
                 errorMessage.style.display = 'block'; // Show the error message
             }
-        });
-    }
+        } catch (error) {
+            const errorMessage = document.getElementById('errorMessage');
+            errorMessage.innerText = error.message;
+            errorMessage.style.display = 'block'; // Show the error message
+        }
+    });
+}
         // Function to check account limit
         async function checkAccountLimit(classCode) {
             const response = await fetch(`/api/checkAccountLimit?classCode=${classCode}`);
