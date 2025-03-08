@@ -72,13 +72,26 @@ async function uploadVideoToCloudflare(videoData) {
     return response.data;
 }
 
+
 // Sign-in endpoint
 app.post('/sign-in', async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // Find user by email
-        const user = user.find(u => u.email === email);
+        // Query Supabase to find user by email
+        const { data: user, error } = await supabase
+            .from('users')
+            .select('*')
+            .eq('email', email)
+            .single();
+
+        if (error) {
+            console.error('Error fetching user:', error);
+            return res.status(500).json({
+                message: 'Internal Server Error',
+                error: error.message
+            });
+        }
 
         if (user) {
             // Compare the provided password with the hashed password
@@ -109,6 +122,7 @@ app.post('/sign-in', async (req, res) => {
         });
     }
 });
+
 
 
 // Video Upload Endpoint
