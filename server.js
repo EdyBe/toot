@@ -82,7 +82,7 @@ async function uploadVideoToCloudflare(videoPath, originalname) {
         const size = fs.statSync(videoPath).size;
 
         const options = {
-            endpoint: ${process.env.CLOUDFLARE_STREAM_API},
+    endpoint: `${process.env.CLOUDFLARE_STREAM_API}`,
             headers: {
                 'Authorization': `Bearer ${process.env.CLOUDFLARE_API_KEY}`
             },
