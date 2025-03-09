@@ -72,97 +72,6 @@ const upload = multer({
 ////
 
 
-
-
-
-app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
-    if (!req.file) {
-        return res.status(400).send('No file uploaded.');
-    }
-
-    const { email, classCode, title, subject } = req.body;
-
-    try {
-        // Fetch user ID based on email
-        const { data: userData, error: userError } = await supabase
-            .from('users')
-            .select('id')
-            .eq('email', email)
-            .single();
-
-        if (userError || !userData) {
-            console.error('User not found:', email);
-            return res.status(404).send('User not found');
-        }
-
-        const userId = userData.id;
-
-        // Create a new video upload URL
-        const createUploadUrlResponse = await axios.post(
-            `${CLOUDFLARE_STREAM_API}/direct_upload`,
-            {},
-            {
-                headers: {
-                    Authorization: `Bearer ${CLOUDFLARE_STREAM_TOKEN}`,
-                },
-            }
-        );
-
-        const uploadUrl = createUploadUrlResponse.data.result.uploadURL;
-        const videoId = createUploadUrlResponse.data.result.uid;
-
-        // Upload the video to Cloudflare Stream using TUS protocol
-        const tusUpload = new tus.Upload(req.file.buffer, {
-            endpoint: uploadUrl,
-            metadata: {
-                filename: req.file.originalname,
-                filetype: req.file.mimetype,
-            },
-            uploadSize: req.file.size,
-            onError: function (error) {
-                console.error('Error uploading video to Cloudflare Stream:', error);
-                res.status(500).send('Error uploading video.');
-            },
-            onSuccess: async function () {
-                try {
-                    // Store metadata in Supabase
-                    const { data, error } = await supabase
-                        .from('videos')
-                        .insert([
-                            {
-                                video_id: videoId,
-                                user_id: userId,
-                                class_code: classCode,
-                                upload_time: new Date(),
-                                title: title,
-                                subject: subject,
-                            },
-                        ]);
-
-                    if (error) {
-                        throw error;
-                    }
-
-                    res.send('File uploaded successfully to Cloudflare Stream and metadata stored in Supabase.');
-                } catch (error) {
-                    console.error('Error storing metadata in Supabase:', error);
-                    res.status(500).send('Error storing metadata.');
-                }
-            },
-        });
-
-        tusUpload.start();
-    } catch (error) {
-        if (error.response) {
-            console.error('Error uploading video:', error.response.data);
-            res.status(500).send(`Error uploading video: ${JSON.stringify(error.response.data)}`);
-        } else {
-            console.error('Error uploading video:', error.message);
-            res.status(500).send(`Error uploading video: ${error.message}`);
-        }
-    }
-});
-
 ////
 
 
@@ -173,7 +82,7 @@ async function uploadVideoToCloudflare(videoPath, originalname) {
         const size = fs.statSync(videoPath).size;
 
         const options = {
-            endpoint: `https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/stream`,
+            endpoint: ${process.env.CLOUDFLARE_STREAM_API},
             headers: {
                 'Authorization': `Bearer ${process.env.CLOUDFLARE_API_KEY}`
             },
@@ -488,54 +397,7 @@ app.get('/user-info', async (req, res) => {
  * @param {Object} req.body - Video metadata
  * @returns {Object} JSON response with upload status
  */
-app.post('/upload', uploadMiddleware.single('video'), async (req, res) =>  {
-    console.log('Upload request received');
-    console.log('Request body:', req.body);
-    console.log('Uploaded file:', req.file);
 
-    if (!req.file) {
-        console.log('No file uploaded');
-        return res.status(400).json({ message: 'No video file uploaded' });
-    }
-
-    try {
-        console.log('Looking up user:', req.body.email);
-        const user = await readUser(req.body.email);
-        if (!user) {
-            console.log('User not found');
-            return res.status(404).json({ message: 'User not found' });
-        }
-
-        // Prepare video data for storage
-        const videoData = {
-            title: req.body.title,
-            subject: req.body.subject,
-            userId: user.id,
-            userEmail: user.email,
-            classCode: req.body.classCode,
-            accountType: user.accountType,
-            schoolName: user.schoolName,
-            buffer: req.file.buffer,
-            filename: `${Date.now()}_${req.file.originalname}`,
-            mimetype: req.file.mimetype,
-            studentName: user.firstName
-        };
-
-        console.log('Video data:', videoData);
-
-        // Upload video to Cloudflare Stream
-        await uploadVideo(videoData);
-
-        // Redirect back to upload page after successful upload
-        res.redirect('/upload-.html');
-    } catch (error) {
-        console.error('Video upload error:', error);
-        res.status(500).json({ 
-            message: 'Failed to upload video',
-            error: error.message 
-        });
-    }
-});
 
 // Serve static files from the current directory
 app.use(express.static(__dirname));
