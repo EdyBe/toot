@@ -11,10 +11,20 @@ const {
 const multer = require('multer'); // Middleware for handling file uploads
 const { Server } = require('@tus/server'); // Import TUS server
 const { FileStore } = require('@tus/file-store'); // Import FileStore for TUS
+const tus = require('tus-js-client');
 const fs = require('fs');
 const axios = require('axios'); // Import Axios for making HTTP requests
 const { createClient } = require('@supabase/supabase-js'); // Import Supabase client
 const path = require('path'); // Path module for file path operations
+const bodyParser = require('body-parser');
+const upload = multer({ dest: 'uploads/' }); // Configure multer for file uploads
+
+app.use(bodyParser.json());
+
+// Initialize Supabase client
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
 
 
 // Database related imports
@@ -53,15 +63,10 @@ const upload = multer({
     }
 });
 
-// Initialize Supabase client
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
+
 
 
 ////
-
-
 
 
 // Function to upload video to Cloudflare Stream using TUS
@@ -118,7 +123,7 @@ app.post('/upload', upload.single('video'), async (req, res) => {
             .from('videos')
             .insert([
                 {
-                    video_id: cloudflareUrl,
+                    video_url: cloudflareUrl,
                     class_code: classCode,
                     uploaded_by: userId,
                     title: title,
