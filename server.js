@@ -136,7 +136,7 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
                                 video_id: videoId,
                                 user_id: userId,
                                 class_code: classCode,
-                                upload_time: new Date(),
+                                created_at: new Date(),
                                 title: title,
                                 subject: subject,
                             },
