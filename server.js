@@ -83,7 +83,6 @@ async function uploadVideoToCloudflare(videoData) {
 /////
 
 
-app.use(bodyParser.json());
 
 
 
