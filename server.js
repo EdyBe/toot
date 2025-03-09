@@ -15,7 +15,7 @@ const fs = require('fs');
 const axios = require('axios'); // Import Axios for making HTTP requests
 const { createClient } = require('@supabase/supabase-js'); // Import Supabase client
 const path = require('path'); // Path module for file path operations
-const upload = multer({ dest: 'uploads/' }); // Configure multer for file uploads
+
 
 // Database related imports
 const { uploadVideo, createUser, updateUser, readUser } = require('./db');
