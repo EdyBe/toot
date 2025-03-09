@@ -10,7 +10,7 @@ const {
 } = require('./emailService'); // Email service functions for password reset
 const multer = require('multer'); // Middleware for handling file uploads
 const { Server } = require('@tus/server'); // Import TUS server
-const {  FileStore } = require('@tus/server');
+const { FileStore } = require('@tus/file-store'); // Import FileStore for TUS
 const fs = require('fs');
 const axios = require('axios'); // Import Axios for making HTTP requests
 const { createClient } = require('@supabase/supabase-js'); // Import Supabase client
