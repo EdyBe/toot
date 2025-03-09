@@ -81,6 +81,7 @@ if (!cloudflareStreamApi) {
     process.exit(1);
 }
 
+
 app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
     if (!req.file) {
         return res.status(400).send('No file uploaded.');
@@ -102,17 +103,22 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
 
         const userId = userData.id;
 
+        const endpoint = `https://api.cloudflare.com/client/v4/accounts/${cloudflareAccountId}/stream?direct_user=true`;
+
         const createUploadUrlResponse = await axios.post(
-            `${cloudflareStreamApi}/direct_upload`,
+            endpoint,
             {},
             {
                 headers: {
-                    Authorization: `Bearer ${process.env.CLOUDFLARE_API_KEY}`,
+                    Authorization: `Bearer ${cloudflareApiToken}`,
+                    'Tus-Resumable': '1.0.0',
+                    'Upload-Length': req.file.size,
+                    'Upload-Metadata': `filename ${Buffer.from(req.file.originalname).toString('base64')},filetype ${Buffer.from(req.file.mimetype).toString('base64')}`,
                 },
             }
         );
 
-        const uploadUrl = createUploadUrlResponse.data.result.uploadURL;
+        const uploadUrl = createUploadUrlResponse.headers.location;
         const videoId = createUploadUrlResponse.data.result.uid;
 
         const tusUpload = new tus.Upload(req.file.buffer, {
