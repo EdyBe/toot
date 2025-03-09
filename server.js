@@ -17,7 +17,7 @@ const axios = require('axios'); // Import Axios for making HTTP requests
 const { createClient } = require('@supabase/supabase-js'); // Import Supabase client
 const path = require('path'); // Path module for file path operations
 const bodyParser = require('body-parser');
-const upload = multer({ dest: 'uploads/' }); // Configure multer for file uploads
+
 
 app.use(bodyParser.json());
 
