@@ -90,9 +90,10 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
       .eq('email', email)
       .single();
 
-    if (userError || !userData) {
-      throw new Error('User not found');
-    }
+      if (userError || !userData) {
+        console.error('User not found:', email);
+        return res.status(404).send('User not found');
+      }
 
     const user_id = userData.id;
 
