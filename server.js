@@ -292,12 +292,15 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
 
         tusUpload.start();
     } catch (error) {
-        console.error('Error uploading video:', error);
-        res.status(500).send('Error uploading video.');
+        if (error.response) {
+            console.error('Error uploading video:', error.response.data);
+            res.status(500).send(`Error uploading video: ${error.response.data}`);
+        } else {
+            console.error('Error uploading video:', error.message);
+            res.status(500).send(`Error uploading video: ${error.message}`);
+        }
     }
 });
-
-
 
 
 
