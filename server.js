@@ -64,8 +64,6 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 
 
-
-
 // Function to upload video to Cloudflare Stream using TUS
 async function uploadVideoToCloudflare(videoPath, originalname) {
     return new Promise((resolve, reject) => {
@@ -120,7 +118,7 @@ app.post('/upload', upload.single('video'), async (req, res) => {
             .from('videos')
             .insert([
                 {
-                    video_url: cloudflareUrl,
+                    video_id: cloudflareUrl,
                     class_code: classCode,
                     uploaded_by: userId,
                     title: title,
@@ -146,7 +144,6 @@ app.post('/upload', upload.single('video'), async (req, res) => {
         });
     }
 });
-
 
 
 
