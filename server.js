@@ -110,7 +110,7 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
             {},
             {
                 headers: {
-                    Authorization: `Bearer ${CLOUDFLARE_STREAM_TOKEN}`,
+                    Authorization: `Bearer ${process.env.CLOUDFLARE_STREAM_TOKEN}`,
                     'Tus-Resumable': '1.0.0',
                     'Upload-Length': req.file.size,
                     'Upload-Metadata': `filename ${Buffer.from(req.file.originalname).toString('base64')},filetype ${Buffer.from(req.file.mimetype).toString('base64')}`,
