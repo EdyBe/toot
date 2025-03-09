@@ -74,15 +74,24 @@ const upload = multer({
 
 ////
 
+const cloudflareStreamApi = process.env.CLOUDFLARE_STREAM_API;
+
+if (!cloudflareStreamApi) {
+    console.error('CLOUDFLARE_STREAM_API is not defined');
+    process.exit(1);
+}
 
 // Function to upload video to Cloudflare Stream using TUS
 async function uploadVideoToCloudflare(videoPath, originalname) {
     return new Promise((resolve, reject) => {
         const file = fs.createReadStream(videoPath);
         const size = fs.statSync(videoPath).size;
+        
+const options = {
+        endpoint: `${cloudflareStreamApi}`,
 
-        const options = {
-    endpoint: `${process.env.CLOUDFLARE_STREAM_API}`,
+        
+
             headers: {
                 'Authorization': `Bearer ${process.env.CLOUDFLARE_API_KEY}`
             },
@@ -105,6 +114,10 @@ async function uploadVideoToCloudflare(videoPath, originalname) {
         upload.start();
     });
 }
+
+
+
+    
 
 // Video Upload Endpoint
 app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
