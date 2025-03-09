@@ -33,6 +33,7 @@
     </div>    
     
     <script>
+        document.getElementById('userEmail').value = sessionStorage.getItem('userEmail') || '';
         document.addEventListener('DOMContentLoaded', async () => {
             // Populate the hidden email field from session storage
             const userEmail = sessionStorage.getItem('userEmail');
@@ -77,7 +78,7 @@
                 event.preventDefault();
                 const classCode = document.getElementById('classCode').value;
                 const videoFile = document.getElementById('videoFile').files[0];
-                const email = document.getElementById('userEmail').value;
+                const email = sessionStorage.getItem('email');
                 const title = document.querySelector('input[name="title"]').value;
                 const subject = document.querySelector('input[name="subject"]').value;
 
