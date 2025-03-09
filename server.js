@@ -75,22 +75,65 @@ async function uploadVideoToCloudflare(videoData) {
     return response.data;
 }
 
-/// Sign-in endpoint
-app.post('/sign-in', (req, res) => {
+
+
+
+
+
+/////
+
+
+app.use(bodyParser.json());
+
+
+
+// Sign-in endpoint
+app.post('/sign-in', async (req, res) => {
     try {
         const { email, password } = req.body;
 
-        // Find user by email and password
-        const user = user.find(u => u.email === email && u.password === password);
+        // Query Supabase to find user by email
+        const { data, error } = await supabase
+            .from('users')
+            .select('*')
+            .eq('email', email)
+            .single();
+
+        if (error) {
+            console.error('Error fetching user:', error);
+            return res.status(500).json({
+                message: 'Internal Server Error',
+                error: error.message
+            });
+        }
+
+        const user = data;
 
         if (user) {
-            // Authentication successful
-            res.json({
-                user: { email: user.email },
-                redirectPage: user.redirectPage
-            });
+            // Compare the provided password with the hashed password
+            const match = await bcrypt.compare(password, user.password);
+            if (match) {
+                // Determine the redirect page based on account type
+                let redirectPage = '';
+                if (user.accountType === 'student') {
+                    redirectPage = 'student-.html';
+                } else if (user.accountType === 'teacher') {
+                    redirectPage = 'teacher-.html';
+                }
+
+                // Authentication successful
+                res.json({
+                    user: { email: user.email, id: user.id },
+                    redirectPage: redirectPage
+                });
+            } else {
+                // Authentication failed
+                res.status(401).json({
+                    message: 'Invalid email or password'
+                });
+            }
         } else {
-            // Authentication failed
+            // User not found
             res.status(401).json({
                 message: 'Invalid email or password'
             });
@@ -98,12 +141,11 @@ app.post('/sign-in', (req, res) => {
     } catch (error) {
         console.error('Error during sign-in:', error);
         res.status(500).json({
-            message: 'Internal Server Error'
+            message: 'Internal Server Error',
+            error: error.message // Include the error message in the response for debugging
         });
     }
 });
-
-
 
 // Fetch class codes endpoint
 app.get('/class-codes', async (req, res) => {
@@ -142,6 +184,17 @@ app.get('/class-codes', async (req, res) => {
         });
     }
 });
+
+
+
+
+
+
+
+/////
+
+
+
 
 // Video Upload Endpoint
 app.post('/upload', upload.single('video'), async (req, res) => {
