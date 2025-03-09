@@ -17,6 +17,8 @@ const { createClient } = require('@supabase/supabase-js'); // Import Supabase cl
 const path = require('path'); // Path module for file path operations
 const bodyParser = require('body-parser');
 const tus = require('tus-js-client');
+const { PassThrough } = require('stream'); // Import stream module
+
 
 
 // Configure multer storage
@@ -82,6 +84,8 @@ if (!cloudflareStreamApi) {
 }
 
 
+
+
 app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
     if (!req.file) {
         return res.status(400).send('No file uploaded.');
@@ -103,6 +107,7 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
 
         const userId = userData.id;
 
+        // Step 1: Request Direct Upload URL from Cloudflare
         const createUploadUrlResponse = await axios.post(
             `${cloudflareStreamApi}/direct_upload`,
             {},
@@ -116,8 +121,13 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
         const uploadUrl = createUploadUrlResponse.data.result.uploadURL;
         const videoId = createUploadUrlResponse.data.result.uid;
 
-        const tusUpload = new tus.Upload(req.file.buffer, {
-            endpoint: uploadUrl,
+        // Step 2: Convert Buffer to Stream (for tus)
+        const stream = new PassThrough();
+        stream.end(req.file.buffer);
+
+        // Step 3: Upload Video Using tus
+        const tusUpload = new tus.Upload(stream, {
+            endpoint: uploadUrl, // Set the correct upload URL
             metadata: {
                 filename: req.file.originalname,
                 filetype: req.file.mimetype,
@@ -125,7 +135,7 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
             uploadSize: req.file.size,
             onError: function (error) {
                 console.error('Error uploading video to Cloudflare Stream:', error);
-                res.status(500).send('Error uploading video.');
+                return res.status(500).send('Error uploading video.');
             },
             onSuccess: async function () {
                 try {
@@ -136,7 +146,7 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
                                 video_id: videoId,
                                 user_id: userId,
                                 class_code: classCode,
-                                created_at: new Date(),
+                                upload_time: new Date(),
                                 title: title,
                                 subject: subject,
                             },
@@ -146,23 +156,21 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
                         throw error;
                     }
 
-                    res.send('File uploaded successfully to Cloudflare Stream and metadata stored in Supabase.');
+                    return res.send({
+                        message: 'File uploaded successfully to Cloudflare Stream and metadata stored in Supabase.',
+                        videoId,
+                    });
                 } catch (error) {
                     console.error('Error storing metadata in Supabase:', error);
-                    res.status(500).send('Error storing metadata.');
+                    return res.status(500).send('Error storing metadata.');
                 }
             },
         });
 
         tusUpload.start();
     } catch (error) {
-        if (error.response) {
-            console.error('Error uploading video:', error.response.data);
-            res.status(500).send(`Error uploading video: ${error.response.data}`);
-        } else {
-            console.error('Error uploading video:', error.message);
-            res.status(500).send(`Error uploading video: ${error.message}`);
-        }
+        console.error('Error uploading video:', error.message);
+        return res.status(500).send(`Error uploading video: ${error.message}`);
     }
 });
 
