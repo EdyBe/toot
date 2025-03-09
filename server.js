@@ -21,7 +21,7 @@ const tus = require('tus-js-client');
 
 // Configure multer storage
 const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+
 
 // Initialize Supabase client
 const supabaseUrl = process.env.SUPABASE_URL;
