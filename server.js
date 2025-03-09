@@ -98,8 +98,14 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
         const userId = userData.id;
 
         // Get the Cloudflare Stream API endpoint and token from environment variables
-        const CLOUDFLARE_STREAM_API = process.env.CLOUDFLARE_STREAM_API;
-        const CLODFLARE_STREAM_TOKEN = process.env.CLOUDFLARE_STREAM_TOKEN;
+        // Check if Cloudflare Stream API and token are defined
+const CLOUDFLARE_STREAM_API = process.env.CLOUDFLARE_STREAM_API;
+const CLOUDFLARE_STREAM_TOKEN = process.env.CLOUDFLARE_STREAM_TOKEN;
+
+if (!CLOUDFLARE_STREAM_API || !CLOUDFLARE_STREAM_TOKEN) {
+    console.error('Cloudflare Stream API URL or token is not defined in environment variables.');
+    process.exit(1);
+}
 
         // Create a new video upload URL
         const createUploadUrlResponse = await axios.post(
@@ -198,56 +204,88 @@ async function uploadVideoToCloudflare(videoPath, originalname) {
 }
 
 // Video Upload Endpoint
-app.post('/upload', upload.single('video'), async (req, res) => {
+app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
     if (!req.file) {
-        return res.status(400).json({ message: 'No video file uploaded' });
+        return res.status(400).send('No file uploaded.');
     }
 
-    const { classCode, userId, title, subject } = req.body;
-    const videoData = req.file;
+    const { email, classCode, title, subject } = req.body;
 
     try {
-        // Ensure the file path is correct
-        const videoPath = path.resolve(videoData.path);
-        console.log('Video data:', videoData);
-        console.log('Video path:', videoPath);
+        // Fetch user ID based on email
+        const { data: userData, error: userError } = await supabase
+            .from('users')
+            .select('id')
+            .eq('email', email)
+            .single();
 
-        // Upload video to Cloudflare Stream using TUS
-        const cloudflareUrl = await uploadVideoToCloudflare(videoPath, videoData.originalname);
-
-        // Store video metadata in Supabase
-        const { data, error } = await supabase
-            .from('videos')
-            .insert([
-                {
-                    video_url: cloudflareUrl,
-                    class_code: classCode,
-                    uploaded_by: userId,
-                    title: title,
-                    subject: subject
-                }
-            ]);
-
-        if (error) {
-            console.error('Error storing video metadata:', error);
-            return res.status(500).json({
-                message: 'Internal Server Error',
-                error: error.message
-            });
+        if (userError || !userData) {
+            console.error('User not found:', email);
+            return res.status(404).send('User not found');
         }
 
-        console.log('Supabase response:', data);
-        res.json({ message: 'Video uploaded successfully' });
+        const userId = userData.id;
+
+        // Create a new video upload URL
+        const createUploadUrlResponse = await axios.post(
+            `${CLOUDFLARE_STREAM_API}/direct_upload`,
+            {},
+            {
+                headers: {
+                    Authorization: `Bearer ${CLOUDFLARE_STREAM_TOKEN}`,
+                },
+            }
+        );
+
+        const uploadUrl = createUploadUrlResponse.data.result.uploadURL;
+        const videoId = createUploadUrlResponse.data.result.uid;
+
+        // Upload the video to Cloudflare Stream using TUS protocol
+        const tusUpload = new tus.Upload(req.file.buffer, {
+            endpoint: uploadUrl,
+            metadata: {
+                filename: req.file.originalname,
+                filetype: req.file.mimetype,
+            },
+            uploadSize: req.file.size,
+            onError: function (error) {
+                console.error('Error uploading video to Cloudflare Stream:', error);
+                res.status(500).send('Error uploading video.');
+            },
+            onSuccess: async function () {
+                try {
+                    // Store metadata in Supabase
+                    const { data, error } = await supabase
+                        .from('videos')
+                        .insert([
+                            {
+                                video_id: videoId,
+                                user_id: userId,
+                                class_code: classCode,
+                                upload_time: new Date(),
+                                title: title,
+                                subject: subject,
+                            },
+                        ]);
+
+                    if (error) {
+                        throw error;
+                    }
+
+                    res.send('File uploaded successfully to Cloudflare Stream and metadata stored in Supabase.');
+                } catch (error) {
+                    console.error('Error storing metadata in Supabase:', error);
+                    res.status(500).send('Error storing metadata.');
+                }
+            },
+        });
+
+        tusUpload.start();
     } catch (error) {
         console.error('Error uploading video:', error);
-        res.status(500).json({
-            message: 'Internal Server Error',
-            error: error.message // Include the error message in the response for debugging
-        });
+        res.status(500).send('Error uploading video.');
     }
 });
-
-
 
 
 
@@ -637,5 +675,5 @@ app.post('/videos/view', async (req, res) => {
 });
 
 app.listen(port, () => {
-    console.log(`Server is running on port:${port}`);
+    console.log(`Server is running on port ${port}`);
 });
