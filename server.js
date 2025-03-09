@@ -21,6 +21,7 @@ const tus = require('tus-js-client');
 
 // Configure multer storage
 const storage = multer.memoryStorage();
+const uploadMiddleware = multer({ storage: storage });
 
 
 // Initialize Supabase client
@@ -451,7 +452,7 @@ app.get('/user-info', async (req, res) => {
  * @param {Object} req.body - Video metadata
  * @returns {Object} JSON response with upload status
  */
-app.post('/upload', upload.single('video'), async (req, res) => {
+app.post('/upload', uploadMiddleware.single('video'), async (req, res) =>  {
     console.log('Upload request received');
     console.log('Request body:', req.body);
     console.log('Uploaded file:', req.file);
