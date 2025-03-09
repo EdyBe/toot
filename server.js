@@ -18,7 +18,7 @@ const path = require('path'); // Path module for file path operations
 const bodyParser = require('body-parser');
 
 
-app.use(bodyParser.json());
+
 
 // Initialize Supabase client
 const supabaseUrl = process.env.SUPABASE_URL;
