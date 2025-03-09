@@ -103,22 +103,17 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
 
         const userId = userData.id;
 
-        const endpoint = `cloudflareStreamApi?direct_user=true`;
-
         const createUploadUrlResponse = await axios.post(
-            endpoint,
+            `${cloudflareStreamApi}/direct_upload`,
             {},
             {
                 headers: {
-                    Authorization: `Bearer ${process.env.CLOUDFLARE_STREAM_TOKEN}`,
-                    'Tus-Resumable': '1.0.0',
-                    'Upload-Length': req.file.size,
-                    'Upload-Metadata': `filename ${Buffer.from(req.file.originalname).toString('base64')},filetype ${Buffer.from(req.file.mimetype).toString('base64')}`,
+                    Authorization: `Bearer ${process.env.CLOUDFLARE_API_KEY}`,
                 },
             }
         );
 
-        const uploadUrl = createUploadUrlResponse.headers.location;
+        const uploadUrl = createUploadUrlResponse.data.result.uploadURL;
         const videoId = createUploadUrlResponse.data.result.uid;
 
         const tusUpload = new tus.Upload(req.file.buffer, {
@@ -170,7 +165,6 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
         }
     }
 });
-
 
 ///
 
