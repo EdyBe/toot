@@ -123,7 +123,7 @@ if (!CLOUDFLARE_STREAM_API || !CLOUDFLARE_STREAM_TOKEN) {
             {},
             {
                 headers: {
-                    Authorization: `Bearer ${CLODFLARE_STREAM_TOKEN}`,
+                    Authorization: `Bearer ${CLOUDFLARE_STREAM_TOKEN}`,
                 },
             }
         );
