@@ -1,45 +1,47 @@
+<!-- HTML for the upload page -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Upload Video</title>
-    <link rel="stylesheet" href="upload-.css">
 </head>
 <body>
-    <header>
-        <button class="back-button" onclick="location.href='student-.html'">Back</button>
-        <div class="image">
-            <img src="prolerus logo it6.png" alt="Logo" width="90" height="90" />
-    </div> 
-    </header>
-    <div class="card">
-    <div class="upload-container">
-        <h2>Upload Video</h2>
-        <form id="uploadForm" action="/upload" method="POST" enctype="multipart/form-data">
-            <input type="hidden" name="email" id="userEmail"> <!-- Hidden email field -->
-            <input type="text" name="title" placeholder="Video Title" required>
-            <input type="text" name="subject" placeholder="Subject" required>
-            <select name="classCode" required>
-                <option value="" disabled selected>Select Class Code</option>
-                <!-- Class codes will be populated here -->
-            </select>
-            <input type="file" name="video" accept="video/*" required>
-            <button type="submit">Upload Video</button>
-            <p class="error-message" id="uploadErrorMessage"></p>
-        </form>
-    </div>
-    </div>
+    <form id="uploadForm">
+        <label for="classCode">Select Class Code:</label>
+        <select id="classCode" name="classCode">
+            <!-- Options will be populated dynamically -->
+        </select>
+        <input type="file" id="videoFile" name="videoFile" accept="video/*">
+        <input type="hidden" id="userEmail" name="userEmail">
+        <button type="submit">Upload</button>
+    </form>
+
     <script>
+        // Populate the hidden email field from session storage
+        document.getElementById('userEmail').value = sessionStorage.getItem('userEmail') || '';
+
         // Fetch class codes from the server
         async function fetchClassCodes() {
             try {
                 const email = document.getElementById('userEmail').value; // Get the user's email
+                if (!email) {
+                    console.error('User email not found in session storage');
+                    return;
+                }
+
                 const response = await fetch(`/class-codes?email=${encodeURIComponent(email)}`); // Endpoint to get class codes
-                const classCodes = await response.json();
+                if (!response.ok) {
+                    throw new Error('Failed to fetch class codes');
+                }
+
+                const data = await response.json();
                 const classCodeSelect = document.querySelector('select[name="classCode"]');
 
-                classCodes.forEach(code => {
+                // Clear existing options
+                classCodeSelect.innerHTML = '';
+
+                data.classCodes.forEach(code => {
                     const option = document.createElement('option');
                     option.value = code;
                     option.textContent = code;
@@ -47,14 +49,44 @@
                 });
             } catch (error) {
                 console.error('Error fetching class codes:', error);
+                alert('Failed to load class codes. Please try again later.');
             }
         }
 
-        // Populate the hidden email field from session or previous page
-        document.getElementById('userEmail').value = sessionStorage.getItem('userEmail') || '';
-
         // Call the function to fetch class codes on page load
         fetchClassCodes();
+
+        document.getElementById('uploadForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const classCode = document.getElementById('classCode').value;
+            const videoFile = document.getElementById('videoFile').files[0];
+            const userId = sessionStorage.getItem('userId');
+
+            if (!videoFile) {
+                console.error('No video file selected');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('video', videoFile);
+            formData.append('classCode', classCode);
+            formData.append('userId', userId);
+
+            try {
+                const response = await fetch('/upload', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                if (response.ok) {
+                    console.log('Video uploaded successfully');
+                } else {
+                    console.error('Error uploading video:', await response.text());
+                }
+            } catch (error) {
+                console.error('Error uploading video:', error);
+            }
+        });
     </script>
 </body>
 </html>
