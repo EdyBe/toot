@@ -33,7 +33,6 @@
     </div>    
     
     <script>
-        document.getElementById('userEmail').value = sessionStorage.getItem('userEmail') || '';
         document.addEventListener('DOMContentLoaded', async () => {
             // Populate the hidden email field from session storage
             const userEmail = sessionStorage.getItem('userEmail');
@@ -42,6 +41,22 @@
             } else {
                 console.error('User email not found in session storage');
                 return;
+            }
+
+            // Fetch user information to verify the user
+            async function fetchUserInfo(email) {
+                try {
+                    const response = await fetch(`/user-info?email=${encodeURIComponent(email)}`);
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch user information');
+                    }
+
+                    const data = await response.json();
+                    return data;
+                } catch (error) {
+                    console.error('Error fetching user information:', error);
+                    return null;
+                }
             }
 
             // Fetch class codes from the server
@@ -78,12 +93,20 @@
                 event.preventDefault();
                 const classCode = document.getElementById('classCode').value;
                 const videoFile = document.getElementById('videoFile').files[0];
-                const email = sessionStorage.getItem('email');
+                const email = document.getElementById('userEmail').value;
                 const title = document.querySelector('input[name="title"]').value;
                 const subject = document.querySelector('input[name="subject"]').value;
 
                 if (!videoFile) {
                     console.error('No video file selected');
+                    return;
+                }
+
+                // Verify user information before uploading
+                const userInfo = await fetchUserInfo(email);
+                if (!userInfo) {
+                    console.error('User not found');
+                    document.getElementById('uploadErrorMessage').textContent = 'User not found';
                     return;
                 }
 
