@@ -103,7 +103,7 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
 
         const userId = userData.id;
 
-        const endpoint = `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_STREAM_API}/stream?direct_user=true`;
+        const endpoint = `cloudflareStreamApi?direct_user=true`;
 
         const createUploadUrlResponse = await axios.post(
             endpoint,
