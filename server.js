@@ -108,7 +108,7 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
             {},
             {
                 headers: {
-                    Authorization: `Bearer ${process.env.CLOUDFLARE_API_KEY}`,
+                    Authorization: `Bearer ${process.env.CLOUDFLARE_STREAM_TOKEN}`,
                 },
             }
         );
