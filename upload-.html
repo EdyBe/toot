@@ -36,12 +36,13 @@
                 }
 
                 const data = await response.json();
+                const classCodes = data.classCodes; // Extract class codes from the response
                 const classCodeSelect = document.querySelector('select[name="classCode"]');
 
                 // Clear existing options
                 classCodeSelect.innerHTML = '';
 
-                data.classCodes.forEach(code => {
+                classCodes.forEach(code => {
                     const option = document.createElement('option');
                     option.value = code;
                     option.textContent = code;
