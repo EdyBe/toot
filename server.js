@@ -103,14 +103,14 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
 
         const userId = userData.id;
 
-        const endpoint = `https://api.cloudflare.com/client/v4/accounts/${cloudflareAccountId}/stream?direct_user=true`;
+        const endpoint = `https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_STREAM_API}/stream?direct_user=true`;
 
         const createUploadUrlResponse = await axios.post(
             endpoint,
             {},
             {
                 headers: {
-                    Authorization: `Bearer ${cloudflareApiToken}`,
+                    Authorization: `Bearer ${CLOUDFLARE_STREAM_TOKEN}`,
                     'Tus-Resumable': '1.0.0',
                     'Upload-Length': req.file.size,
                     'Upload-Metadata': `filename ${Buffer.from(req.file.originalname).toString('base64')},filetype ${Buffer.from(req.file.mimetype).toString('base64')}`,
@@ -189,7 +189,7 @@ const options = {
         
 
             headers: {
-                'Authorization': `Bearer ${process.env.CLOUDFLARE_API_KEY}`
+                'Authorization': `Bearer ${process.env.CLOUDFLARE_STREAM_TOKEN}`
             },
             metadata: {
                 filename: originalname,
