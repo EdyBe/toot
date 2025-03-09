@@ -123,30 +123,35 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
       },
       uploadSize: req.file.size,
       onError: function (error) {
-        console.error('Error uploading video:', error);
+        console.error('Error uploading video to Cloudflare Stream:', error);
         res.status(500).send('Error uploading video.');
       },
       onSuccess: async function () {
-        // Store metadata in Supabase
-        const { data, error } = await supabase
-          .from('videos')
-          .insert([
-            {
-              video_id: videoId,
-              user_id: user_id,
-              class_code: class_code,
-              upload_time: new Date(),
-              school_name: school_name,
-              title: title,
-              subject: subject,
-            },
-          ]);
-
-        if (error) {
-          throw error;
+        try {
+          // Store metadata in Supabase
+          const { data, error } = await supabase
+            .from('videos')
+            .insert([
+              {
+                video_id: videoId,
+                user_id: user_id,
+                class_code: class_code,
+                upload_time: new Date(),
+                school_name: school_name,
+                title: title,
+                subject: subject,
+              },
+            ]);
+      
+          if (error) {
+            throw error;
+          }
+      
+          res.send('File uploaded successfully to Cloudflare Stream and metadata stored in Supabase.');
+        } catch (error) {
+          console.error('Error storing metadata in Supabase:', error);
+          res.status(500).send('Error storing metadata.');
         }
-
-        res.send('File uploaded successfully to Cloudflare Stream and metadata stored in Supabase.');
       },
     });
 
