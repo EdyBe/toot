@@ -78,7 +78,7 @@
                 event.preventDefault();
                 const classCode = document.getElementById('classCode').value;
                 const videoFile = document.getElementById('videoFile').files[0];
-                const userId = sessionStorage.getItem('userId');
+                const email = sessionStorage.getItem('email');
                 const title = document.querySelector('input[name="title"]').value;
                 const subject = document.querySelector('input[name="subject"]').value;
 
@@ -90,7 +90,7 @@
                 const formData = new FormData();
                 formData.append('video', videoFile);
                 formData.append('classCode', classCode);
-                formData.append('userId', userId);
+                formData.append('email', email);
                 formData.append('title', title);
                 formData.append('subject', subject);
 
