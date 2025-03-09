@@ -15,6 +15,7 @@ const fs = require('fs');
 const axios = require('axios'); // Import Axios for making HTTP requests
 const { createClient } = require('@supabase/supabase-js'); // Import Supabase client
 const path = require('path'); // Path module for file path operations
+const upload = multer({ dest: 'uploads/' }); // Configure multer for file uploads
 
 // Database related imports
 const { uploadVideo, createUser, updateUser, readUser } = require('./db');
@@ -63,9 +64,6 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 
 
-
-
-
 // Function to upload video to Cloudflare Stream using TUS
 async function uploadVideoToCloudflare(videoPath, originalname) {
     return new Promise((resolve, reject) => {
@@ -107,8 +105,11 @@ app.post('/upload', upload.single('video'), async (req, res) => {
     const videoData = req.file;
 
     try {
+        // Ensure the file path is correct
+        const videoPath = path.resolve(videoData.path);
+
         // Upload video to Cloudflare Stream using TUS
-        const cloudflareUrl = await uploadVideoToCloudflare(videoData.path, videoData.originalname);
+        const cloudflareUrl = await uploadVideoToCloudflare(videoPath, videoData.originalname);
 
         // Store video metadata in Supabase
         const { data, error } = await supabase
@@ -116,78 +117,6 @@ app.post('/upload', upload.single('video'), async (req, res) => {
             .insert([
                 {
                     video_url: cloudflareUrl,
-                    class_code: classCode,
-                    uploaded_by: userId,
-                    title: title,
-                    subject: subject
-                }
-            ]);
-
-        if (error) {
-            console.error('Error storing video metadata:', error);
-            return res.status(500).json({
-                message: 'Internal Server Error',
-                error: error.message
-            });
-        }
-
-        console.log('Supabase response:', data);
-        res.json({ message: 'Video uploaded successfully' });
-    } catch (error) {
-        console.error('Error uploading video:', error);
-        res.status(500).json({
-            message: 'Internal Server Error',
-            error: error.message // Include the error message in the response for debugging
-        });
-    }
-});
-
-
-///
-
-
-
-
-// Function to upload video to Cloudflare Stream
-async function uploadVideoToCloudflare(videoPath, originalname) {
-    const url = `https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/stream`;
-    const headers = {
-        'Authorization': `Bearer ${process.env.CLOUDFLARE_API_KEY}`,
-        'Content-Type': 'multipart/form-data'
-    };
-
-    const formData = new FormData();
-    formData.append('file', fs.createReadStream(videoPath), originalname);
-
-    try {
-        const response = await axios.post(url, formData, { headers });
-        console.log('Cloudflare response:', response.data);
-        return response.data;
-    } catch (error) {
-        console.error('Error uploading to Cloudflare:', error.response ? error.response.data : error.message);
-        throw error;
-    }
-}
-
-// Video Upload Endpoint
-app.post('/upload', upload.single('video'), async (req, res) => {
-    if (!req.file) {
-        return res.status(400).json({ message: 'No video file uploaded' });
-    }
-
-    const { classCode, userId, title, subject } = req.body;
-    const videoData = req.file;
-
-    try {
-        // Upload video to Cloudflare Stream
-        const cloudflareResponse = await uploadVideoToCloudflare(videoData.path, videoData.originalname);
-
-        // Store video metadata in Supabase
-        const { data, error } = await supabase
-            .from('videos')
-            .insert([
-                {
-                    video_url: cloudflareResponse.result.playback.hls,
                     class_code: classCode,
                     uploaded_by: userId,
                     title: title,
