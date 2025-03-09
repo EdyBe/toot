@@ -60,8 +60,10 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 
 
+
+
 // Function to upload video to Cloudflare Stream
-async function uploadVideoToCloudflare(videoData) {
+async function uploadVideoToCloudflare(videoPath, originalname) {
     const url = `https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/stream`;
     const headers = {
         'Authorization': `Bearer ${process.env.CLOUDFLARE_API_KEY}`,
@@ -69,7 +71,7 @@ async function uploadVideoToCloudflare(videoData) {
     };
 
     const formData = new FormData();
-    formData.append('file', videoData.buffer, videoData.originalname);
+    formData.append('file', fs.createReadStream(videoPath), originalname);
 
     try {
         const response = await axios.post(url, formData, { headers });
@@ -92,7 +94,7 @@ app.post('/upload', upload.single('video'), async (req, res) => {
 
     try {
         // Upload video to Cloudflare Stream
-        const cloudflareResponse = await uploadVideoToCloudflare(videoData);
+        const cloudflareResponse = await uploadVideoToCloudflare(videoData.path, videoData.originalname);
 
         // Store video metadata in Supabase
         const { data, error } = await supabase
@@ -125,6 +127,7 @@ app.post('/upload', upload.single('video'), async (req, res) => {
         });
     }
 });
+
 
 
 
