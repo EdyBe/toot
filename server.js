@@ -169,7 +169,7 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
 ///
 
 
-}
+
 
 // Function to upload video to Cloudflare Stream using TUS
 async function uploadVideoToCloudflare(videoPath, originalname) {
