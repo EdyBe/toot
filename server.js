@@ -74,8 +74,7 @@ const upload = multer({
 
 
 
-
-app.post('/upload', upload.single('video'), async (req, res) => {
+app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
   if (!req.file) {
     return res.status(400).send('No file uploaded.');
   }
@@ -115,7 +114,7 @@ app.post('/upload', upload.single('video'), async (req, res) => {
     const videoId = createUploadUrlResponse.data.result.uid;
 
     // Upload the video to Cloudflare Stream using TUS protocol
-    const upload = new tus.Upload(req.file.buffer, {
+    const tusUpload = new tus.Upload(req.file.buffer, {
       endpoint: uploadUrl,
       metadata: {
         filename: req.file.originalname,
@@ -150,15 +149,16 @@ app.post('/upload', upload.single('video'), async (req, res) => {
       },
     });
 
-    upload.start();
+    tusUpload.start();
   } catch (error) {
     console.error('Error uploading video:', error);
     res.status(500).send('Error uploading video.');
   }
 });
 
-
-
+app.listen(3000, () => {
+  console.log('Server is running on port 3000');
+});
 
 
 ////
