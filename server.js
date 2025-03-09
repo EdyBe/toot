@@ -99,8 +99,18 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
 
         // Get the Cloudflare Stream API endpoint and token from environment variables
         // Check if Cloudflare Stream API and token are defined
+// Log environment variables to verify they are loaded
+console.log('CLOUDFLARE_STREAM_API:', process.env.CLOUDFLARE_STREAM_API);
+console.log('CLOUDFLARE_STREAM_TOKEN:', process.env.CLOUDFLARE_STREAM_TOKEN);
+
+// Check if Cloudflare Stream API and token are defined
 const CLOUDFLARE_STREAM_API = process.env.CLOUDFLARE_STREAM_API;
 const CLOUDFLARE_STREAM_TOKEN = process.env.CLOUDFLARE_STREAM_TOKEN;
+
+if (!CLOUDFLARE_STREAM_API || !CLOUDFLARE_STREAM_TOKEN) {
+    console.error('Cloudflare Stream API URL or token is not defined in environment variables.');
+    process.exit(1);
+}
 
 if (!CLOUDFLARE_STREAM_API || !CLOUDFLARE_STREAM_TOKEN) {
     console.error('Cloudflare Stream API URL or token is not defined in environment variables.');
