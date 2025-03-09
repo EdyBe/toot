@@ -59,6 +59,56 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 
 
+
+// Video Upload Endpoint
+app.post('/upload', upload.single('video'), async (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ message: 'No video file uploaded' });
+    }
+
+    const { classCode, userId, title, subject } = req.body;
+    const videoData = req.file;
+
+    try {
+        // Upload video to Cloudflare Stream
+        const cloudflareResponse = await uploadVideoToCloudflare(videoData);
+
+        // Store video metadata in Supabase
+        const { data, error } = await supabase
+            .from('videos')
+            .insert([
+                {
+                    video_url: cloudflareResponse.result.playback.hls,
+                    class_code: classCode,
+                    uploaded_by: userId,
+                    title: title,
+                    subject: subject
+                }
+            ]);
+
+        if (error) {
+            console.error('Error storing video metadata:', error);
+            return res.status(500).json({
+                message: 'Internal Server Error',
+                error: error.message
+            });
+        }
+
+        res.json({ message: 'Video uploaded successfully' });
+    } catch (error) {
+        console.error('Error uploading video:', error);
+        res.status(500).json({
+            message: 'Internal Server Error',
+            error: error.message // Include the error message in the response for debugging
+        });
+    }
+});
+
+
+
+
+
+
 // Function to upload video to Cloudflare Stream
 async function uploadVideoToCloudflare(videoData) {
     const url = `https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/stream`;
@@ -195,47 +245,7 @@ app.get('/class-codes', async (req, res) => {
 
 
 
-// Video Upload Endpoint
-app.post('/upload', upload.single('video'), async (req, res) => {
-    if (!req.file) {
-        return res.status(400).json({ message: 'No video file uploaded' });
-    }
 
-    const { classCode, userId } = req.body;
-    const videoData = req.file;
-
-    try {
-        // Upload video to Cloudflare Stream
-        const cloudflareResponse = await uploadVideoToCloudflare(videoData);
-
-        // Store video metadata in Supabase
-        const { data, error } = await supabase
-            .from('videos')
-            .insert([
-                {
-                    video_url: cloudflareResponse.result.playback.hls,
-                    class_code: classCode,
-                    uploaded_by: userId
-                }
-            ]);
-
-        if (error) {
-            console.error('Error storing video metadata:', error);
-            return res.status(500).json({
-                message: 'Internal Server Error',
-                error: error.message
-            });
-        }
-
-        res.json({ message: 'Video uploaded successfully' });
-    } catch (error) {
-        console.error('Error uploading video:', error);
-        res.status(500).json({
-            message: 'Internal Server Error',
-            error: error.message // Include the error message in the response for debugging
-        });
-    }
-});
 
 
 
