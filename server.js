@@ -76,95 +76,90 @@ const upload = multer({
 
 
 app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
-  if (!req.file) {
-    return res.status(400).send('No file uploaded.');
-  }
+    if (!req.file) {
+        return res.status(400).send('No file uploaded.');
+    }
 
-  const { email, class_code, school_name, title, subject } = req.body;
+    const { email, classCode, title, subject } = req.body;
 
-  try {
-    // Fetch user ID based on email
-    const { data: userData, error: userError } = await supabase
-      .from('users')
-      .select('id')
-      .eq('email', email)
-      .single();
+    try {
+        // Fetch user ID based on email
+        const { data: userData, error: userError } = await supabase
+            .from('users')
+            .select('id')
+            .eq('email', email)
+            .single();
 
-      if (userError || !userData) {
-        console.error('User not found:', email);
-        return res.status(404).send('User not found');
-      }
-
-    const user_id = userData.id;
-
-    // Get the Cloudflare Stream API endpoint and token from environment variables
-    const CLOUDFLARE_STREAM_API = process.env.CLOUDFLARE_STREAM_API;
-    const CLOUDFLARE_STREAM_TOKEN = process.env.CLOUDFLARE_STREAM_TOKEN;
-
-    // Create a new video upload URL
-    const createUploadUrlResponse = await axios.post(
-      `${CLOUDFLARE_STREAM_API}/direct_upload`,
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${CLOUDFLARE_STREAM_TOKEN}`,
-        },
-      }
-    );
-
-    const uploadUrl = createUploadUrlResponse.data.result.uploadURL;
-    const videoId = createUploadUrlResponse.data.result.uid;
-
-    // Upload the video to Cloudflare Stream using TUS protocol
-    const tusUpload = new tus.Upload(req.file.buffer, {
-      endpoint: uploadUrl,
-      metadata: {
-        filename: req.file.originalname,
-        filetype: req.file.mimetype,
-      },
-      uploadSize: req.file.size,
-      onError: function (error) {
-        console.error('Error uploading video to Cloudflare Stream:', error);
-        res.status(500).send('Error uploading video.');
-      },
-      onSuccess: async function () {
-        try {
-          // Store metadata in Supabase
-          const { data, error } = await supabase
-            .from('videos')
-            .insert([
-              {
-                video_id: videoId,
-                user_id: user_id,
-                class_code: class_code,
-                upload_time: new Date(),
-                school_name: school_name,
-                title: title,
-                subject: subject,
-              },
-            ]);
-      
-          if (error) {
-            throw error;
-          }
-      
-          res.send('File uploaded successfully to Cloudflare Stream and metadata stored in Supabase.');
-        } catch (error) {
-          console.error('Error storing metadata in Supabase:', error);
-          res.status(500).send('Error storing metadata.');
+        if (userError || !userData) {
+            console.error('User not found:', email);
+            return res.status(404).send('User not found');
         }
-      },
-    });
 
-    tusUpload.start();
-  } catch (error) {
-    console.error('Error uploading video:', error);
-    res.status(500).send('Error uploading video.');
-  }
-});
+        const userId = userData.id;
 
-app.listen(3000, () => {
-  console.log('Server is running on port 3000');
+        // Get the Cloudflare Stream API endpoint and token from environment variables
+        const CLOUDFLARE_STREAM_API = process.env.CLOUDFLARE_STREAM_API;
+        const CLODFLARE_STREAM_TOKEN = process.env.CLOUDFLARE_STREAM_TOKEN;
+
+        // Create a new video upload URL
+        const createUploadUrlResponse = await axios.post(
+            `${CLOUDFLARE_STREAM_API}/direct_upload`,
+            {},
+            {
+                headers: {
+                    Authorization: `Bearer ${CLODFLARE_STREAM_TOKEN}`,
+                },
+            }
+        );
+
+        const uploadUrl = createUploadUrlResponse.data.result.uploadURL;
+        const videoId = createUploadUrlResponse.data.result.uid;
+
+        // Upload the video to Cloudflare Stream using TUS protocol
+        const tusUpload = new tus.Upload(req.file.buffer, {
+            endpoint: uploadUrl,
+            metadata: {
+                filename: req.file.originalname,
+                filetype: req.file.mimetype,
+            },
+            uploadSize: req.file.size,
+            onError: function (error) {
+                console.error('Error uploading video to Cloudflare Stream:', error);
+                res.status(500).send('Error uploading video.');
+            },
+            onSuccess: async function () {
+                try {
+                    // Store metadata in Supabase
+                    const { data, error } = await supabase
+                        .from('videos')
+                        .insert([
+                            {
+                                video_id: videoId,
+                                user_id: userId,
+                                class_code: classCode,
+                                upload_time: new Date(),
+                                title: title,
+                                subject: subject,
+                            },
+                        ]);
+
+                    if (error) {
+                        throw error;
+                    }
+
+                    res.send('File uploaded successfully to Cloudflare Stream and metadata stored in Supabase.');
+                } catch (error) {
+                    console.error('Error storing metadata in Supabase:', error);
+                    res.status(500).send('Error storing metadata.');
+                }
+            },
+        });
+
+        tusUpload.start();
+    } catch (error) {
+        console.error('Error uploading video:', error);
+        res.status(500).send('Error uploading video.');
+    }
 });
 
 
