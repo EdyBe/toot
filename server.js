@@ -86,6 +86,7 @@ if (!cloudflareStreamApi) {
 
 
 
+
 app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
     if (!req.file) {
         return res.status(400).send('No file uploaded.');
@@ -114,6 +115,7 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
             {
                 headers: {
                     Authorization: `Bearer ${process.env.CLOUDFLARE_STREAM_TOKEN}`,
+                    'Content-Type': 'application/json'
                 },
             }
         );
@@ -146,7 +148,7 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
                                 video_id: videoId,
                                 user_id: userId,
                                 class_code: classCode,
-                                upload_time: new Date(),
+                                created_at: new Date(),
                                 title: title,
                                 subject: subject,
                             },
