@@ -11,6 +11,7 @@ const {
 const multer = require('multer'); // Middleware for handling file uploads
 const { Server } = require('@tus/server'); // Import TUS server
 const { FileStore } = require('@tus/file-store'); // Import FileStore for TUS
+const fs = require('fs');
 const axios = require('axios'); // Import Axios for making HTTP requests
 const { createClient } = require('@supabase/supabase-js'); // Import Supabase client
 const path = require('path'); // Path module for file path operations
@@ -57,7 +58,92 @@ const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
 
+////
 
+
+
+
+
+
+
+// Function to upload video to Cloudflare Stream using TUS
+async function uploadVideoToCloudflare(videoPath, originalname) {
+    return new Promise((resolve, reject) => {
+        const file = fs.createReadStream(videoPath);
+        const size = fs.statSync(videoPath).size;
+
+        const options = {
+            endpoint: `https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_ACCOUNT_ID}/stream`,
+            headers: {
+                'Authorization': `Bearer ${process.env.CLOUDFLARE_API_KEY}`
+            },
+            metadata: {
+                filename: originalname,
+                filetype: 'video/mp4'
+            },
+            uploadSize: size,
+            onError: (error) => {
+                console.error('Error uploading to Cloudflare:', error);
+                reject(error);
+            },
+            onSuccess: () => {
+                console.log('Upload to Cloudflare successful');
+                resolve(upload.url);
+            }
+        };
+
+        const upload = new tus.Upload(file, options);
+        upload.start();
+    });
+}
+
+// Video Upload Endpoint
+app.post('/upload', upload.single('video'), async (req, res) => {
+    if (!req.file) {
+        return res.status(400).json({ message: 'No video file uploaded' });
+    }
+
+    const { classCode, userId, title, subject } = req.body;
+    const videoData = req.file;
+
+    try {
+        // Upload video to Cloudflare Stream using TUS
+        const cloudflareUrl = await uploadVideoToCloudflare(videoData.path, videoData.originalname);
+
+        // Store video metadata in Supabase
+        const { data, error } = await supabase
+            .from('videos')
+            .insert([
+                {
+                    video_url: cloudflareUrl,
+                    class_code: classCode,
+                    uploaded_by: userId,
+                    title: title,
+                    subject: subject
+                }
+            ]);
+
+        if (error) {
+            console.error('Error storing video metadata:', error);
+            return res.status(500).json({
+                message: 'Internal Server Error',
+                error: error.message
+            });
+        }
+
+        console.log('Supabase response:', data);
+        res.json({ message: 'Video uploaded successfully' });
+    } catch (error) {
+        console.error('Error uploading video:', error);
+        res.status(500).json({
+            message: 'Internal Server Error',
+            error: error.message // Include the error message in the response for debugging
+        });
+    }
+});
+
+
+///
 
 
 
