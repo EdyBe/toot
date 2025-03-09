@@ -11,7 +11,6 @@ const {
 const multer = require('multer'); // Middleware for handling file uploads
 const { Server } = require('@tus/server'); // Import TUS server
 const { Server, FileStore } = require('@tus/server');
-const tus = require('tus-js-client');
 const fs = require('fs');
 const axios = require('axios'); // Import Axios for making HTTP requests
 const { createClient } = require('@supabase/supabase-js'); // Import Supabase client
