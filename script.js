@@ -216,3 +216,7 @@ if (signOutButton) {
         window.location.href = 'sign-in.html';
     });
 }
+        }
+    catch (error) {
+        console.error('An error occurred:', error);
+    } });
