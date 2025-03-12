@@ -130,6 +130,11 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
             }
         );
 
+        if (createUploadUrlResponse.status !== 200) {
+            console.error('Failed to get upload URL from Cloudflare:', createUploadUrlResponse.data);
+            return res.status(400).send('Failed to get upload URL from Cloudflare.');
+        }
+
         const uploadUrl = createUploadUrlResponse.data.result.uploadURL;
         const videoId = createUploadUrlResponse.data.result.uid;
 
@@ -185,7 +190,6 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
         return res.status(500).send(`Error uploading video: ${error.message}`);
     }
 });
-
 ///
 
 
