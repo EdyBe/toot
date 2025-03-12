@@ -36,6 +36,10 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 // Database related imports
 const { uploadVideo, createUser, updateUser, readUser } = require('./db');
 
+// Initialize Express application
+const app = express();
+const port = process.env.PORT || 4000;
+
 // Middleware Configuration
 app.use(cors({
     origin: 'https://toot-jc51.onrender.com', // Replace with your client's domain
@@ -44,9 +48,7 @@ app.use(cors({
     optionsSuccessStatus: 204
 }));
 
-// Initialize Express application
-const app = express();
-const port = process.env.PORT || 4000;
+
 
 // Security and database modules
 const bcrypt = require('bcrypt'); // For password hashing
