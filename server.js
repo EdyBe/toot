@@ -35,6 +35,13 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 // Database related imports
 const { uploadVideo, createUser, updateUser, readUser } = require('./db');
 const cors = require('cors'); // CORS middleware for cross-origin requests
+// Middleware Configuration
+app.use(cors({
+    origin: 'https://toot-jc51.onrender.com', // Replace with your client's domain
+    methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+    credentials: true,
+    optionsSuccessStatus: 204
+}));
 
 // Initialize Express application
 const app = express();
