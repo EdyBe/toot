@@ -126,75 +126,70 @@ if (signInForm) {
             });
         }
 
-        // Handle upload form if it exists
-        const uploadForm = document.getElementById('uploadForm');
-        if (uploadForm) {
-            uploadForm.addEventListener('submit', async function(event) {
-                event.preventDefault();
-                const email = sessionStorage.getItem('userEmail');
-                if (!email) {
-                    throw new Error('User not authenticated');
-                }
-                
-                const title = this[0].value;
-                const subject = this[1].value;
-                const fileInput = this.querySelector('input[type="file"]');
-                
-                // Show the loading spinner
-                document.getElementById('loadingSpinner').style.display = 'block';
-                
-                // Get Class Code from user session
-                const userInfo = await fetch('/user-info?email=' + encodeURIComponent(email))
-                    .then(res => res.json())
-                    .catch(() => {
-                        throw new Error('Failed to fetch user info');
-                    });
-                if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
-                    throw new Error('Please select a video file to upload');
-                }
-                const videoFile = fileInput.files[0];
-
-                // Get Class Code from user info
-                const classCode = userInfo.classCode; // Retrieve classCode from userInfo
-                
-                // Create a FormData object to send the video file
-                const formData = new FormData();
-                formData.append('email', email);
-                formData.append('title', title);
-                formData.append('subject', subject);
-                formData.append('video', videoFile);
-                formData.append('classCode', classCode);
-
-                try {
-                    const response = await fetch('/upload', { 
-                        method: 'POST',
-                        headers: {
-                            'Accept': 'application/json'
-                        },
-                        body: formData
-                    });
-
-                    // Hide the loading spinner
-                    document.getElementById('loadingSpinner').style.display = 'none';
-                    
-                    if (response.ok) {
-                        // Display the success message
-                        document.getElementById('uploadSuccessMessage').innerText = 'Your work was successfully uploaded!';
-                    } else {
-                        throw new Error('Upload failed');
-                    }
-                } catch (error) {
-                    // Hide the loading spinner
-                    document.getElementById('loadingSpinner').style.display = 'none';
-                }
-            });
+      // Handle upload form if it exists
+const uploadForm = document.getElementById('uploadForm');
+if (uploadForm) {
+    uploadForm.addEventListener('submit', async function(event) {
+        event.preventDefault();
+        const email = sessionStorage.getItem('userEmail');
+        if (!email) {
+            throw new Error('User not authenticated');
         }
-    } catch (error) {
-        console.error('Error initializing page:', error);
-    }
         
-});
+        const title = this[0].value;
+        const subject = this[1].value;
+        const fileInput = this.querySelector('input[type="file"]');
+        
+        // Show the loading spinner
+        document.getElementById('loadingSpinner').style.display = 'block';
+        
+        // Get Class Code from user session
+        const userInfo = await fetch('/user-info?email=' + encodeURIComponent(email))
+            .then(res => res.json())
+            .catch(() => {
+                throw new Error('Failed to fetch user info');
+            });
+        if (!fileInput || !fileInput.files || fileInput.files.length === 0) {
+            throw new Error('Please select a video file to upload');
+        }
+        const videoFile = fileInput.files[0];
 
+        // Get Class Code from user info
+        const classCode = userInfo.classCode; // Retrieve classCode from userInfo
+        
+        // Create a FormData object to send the video file
+        const formData = new FormData();
+        formData.append('email', email);
+        formData.append('title', title);
+        formData.append('subject', subject);
+        formData.append('video', videoFile);
+        formData.append('classCode', classCode);
+
+        try {
+            const response = await fetch('/upload', { 
+                method: 'POST',
+                headers: {
+                    'Accept': 'application/json'
+                },
+                body: formData
+            });
+
+            // Hide the loading spinner
+            document.getElementById('loadingSpinner').style.display = 'none';
+            
+            if (response.ok) {
+                // Display the success message
+                document.getElementById('uploadSuccessMessage').innerText = 'Your work was successfully uploaded!';
+            } else {
+                throw new Error('Upload failed');
+            }
+        } catch (error) {
+            // Hide the loading spinner
+            document.getElementById('loadingSpinner').style.display = 'none';
+            console.error('Error uploading video:', error);
+        }
+    });
+}
 // Function to delete a video
 function deleteVideo(videoId) {
     if (confirm("Are you sure you want to delete this video? This action cannot be undone.")) {
