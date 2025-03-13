@@ -138,7 +138,7 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
         const userId = userData.id;
 
         // Step 1: Request Direct Upload URL from Cloudflare
-        const endpoint = `https://api.cloudflare.com/client/v4/accounts/${cloudflareStreamId}/stream/direct_upload`;
+        const endpoint = `https://api.cloudflare.com/client/v4/accounts/${cloudflareStreamId}/stream?direct_user=true`;
         const createUploadUrlResponse = await axios.post(
             endpoint,
             {
@@ -165,6 +165,14 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
         }
 
         const uploadUrl = createUploadUrlResponse.headers['location'];
+        
+        // Set CORS headers
+        res.set({
+            'Access-Control-Expose-Headers': 'Location',
+            'Access-Control-Allow-Headers': '*',
+            'Access-Control-Allow-Origin': '*',
+            'Location': uploadUrl
+        });
         const videoId = createUploadUrlResponse.data.result.uid;
 
         // Step 2: Convert Buffer to Stream (for tus)
