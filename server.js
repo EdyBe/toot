@@ -217,7 +217,7 @@ async function uploadVideoToCloudflare(videoPath, originalname) {
         const size = fs.statSync(videoPath).size;
         
 const options = {
-        endpoint: `${https://api.cloudflare.com/client/v4/accounts/${cloudflareStreamId}/stream?direct_user=true}`,
+        endpoint: `https://api.cloudflare.com/client/v4/accounts/${cloudflareStreamId}/stream?direct_user=true`,
 
         
 
