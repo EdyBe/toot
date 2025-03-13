@@ -248,10 +248,18 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
             'Access-Control-Allow-Origin': '*',
             'Location': uploadUrl
         });
-        const videoId = createUploadUrlResponse.data?.result?.uid;
+        // Extract video ID from location header
+        const location = createUploadUrlResponse.headers['location'];
+        if (!location) {
+            console.error('Failed to get location header from Cloudflare response:', createUploadUrlResponse.headers);
+            return res.status(400).send('Failed to get upload location from Cloudflare.');
+        }
+        
+        // Extract video ID from location URL
+        const videoId = location.split('/').pop().split('?')[0];
         if (!videoId) {
-            console.error('Failed to get video ID from Cloudflare response:', createUploadUrlResponse.data);
-            return res.status(400).send('Failed to get video ID from Cloudflare.');
+            console.error('Failed to extract video ID from location:', location);
+            return res.status(400).send('Failed to extract video ID from Cloudflare response.');
         }
 
         // Step 2: Convert Buffer to Stream (for tus)
