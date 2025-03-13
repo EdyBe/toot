@@ -99,9 +99,9 @@ if (!cloudflareStreamId) {
 
 
 
-const cloudflareApiToken = process.env.CLOUDFLARE_STREAM_TOKEN;
+const cloudflareStreamToken = process.env.CLOUDFLARE_STREAM_TOKEN;
 
-if (!cloudflareStreamApi || !cloudflareApiToken) {
+if (!cloudflareStreamID || !cloudflareStreamToken) {
     console.error('Cloudflare Stream API configuration is not defined');
     process.exit(1);
 }
@@ -134,7 +134,7 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
             {},
             {
                 headers: {
-                    Authorization: `Bearer ${cloudflareApiToken}`,
+                    Authorization: `Bearer ${cloudflareStreamToken}`,
                     'Tus-Resumable': '1.0.0',
                     'Upload-Length': req.file.size,
                     'Upload-Metadata': `filename ${Buffer.from(req.file.originalname).toString('base64')},filetype ${Buffer.from(req.file.mimetype).toString('base64')}`
@@ -217,12 +217,12 @@ async function uploadVideoToCloudflare(videoPath, originalname) {
         const size = fs.statSync(videoPath).size;
         
 const options = {
-        endpoint: `${cloudflareStreamApi}`,
+        endpoint: `${https://api.cloudflare.com/client/v4/accounts/${cloudflareStreamId}/stream?direct_user=true}`,
 
         
 
             headers: {
-                'Authorization': `Bearer ${process.env.CLOUDFLARE_STREAM_TOKEN}`
+                Authorization: `Bearer ${cloudflareStreamToken}`,
             },
             metadata: {
                 filename: originalname,
