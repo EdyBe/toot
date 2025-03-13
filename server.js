@@ -139,15 +139,27 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
 
         // Step 1: Request Direct Upload URL from Cloudflare
         const endpoint = `https://api.cloudflare.com/client/v4/accounts/${cloudflareStreamId}/stream?direct_user=true`;
+        // Get video duration using ffprobe
+        const { execSync } = require('child_process');
+        let duration = 0;
+        try {
+            const ffprobeOutput = execSync(`ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 "${req.file.originalname}"`);
+            duration = parseFloat(ffprobeOutput.toString().trim());
+        } catch (error) {
+            console.error('Error getting video duration:', error);
+        }
+
         const createUploadUrlResponse = await axios.post(
             endpoint,
             {
                 creator: email, // Creator's email
                 meta: {
                     name: req.file.originalname,
-                    creator: email
+                    creator: email,
+                    duration: duration
                 },
-                requireSignedURLs: false
+                requireSignedURLs: false,
+                maxDurationSeconds: duration > 0 ? Math.ceil(duration) : 14400 // Default to 4 hours if duration not available
             },
             {
                 headers: {
@@ -160,7 +172,11 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
         );
 
         if (createUploadUrlResponse.status !== 200) {
-            console.error('Failed to get upload URL from Cloudflare:', createUploadUrlResponse.data);
+            console.error('Failed to get upload URL from Cloudflare:', {
+                status: createUploadUrlResponse.status,
+                data: createUploadUrlResponse.data,
+                headers: createUploadUrlResponse.headers
+            });
             return res.status(400).send('Failed to get upload URL from Cloudflare.');
         }
 
