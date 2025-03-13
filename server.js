@@ -723,6 +723,34 @@ app.post('/api/reset-password', async (req, res) => {
     }
 });
 
+// Endpoint to fetch videos for a user
+app.get('/videos', async (req, res) => {
+    try {
+        const email = req.query.email;
+        if (!email) {
+            return res.status(400).json({ message: 'Email is required' });
+        }
+
+        // Get user details and associated videos
+        const { user, videos } = await readUser(email);
+        
+        // Format videos for frontend
+        const formattedVideos = videos.map(video => ({
+            _id: video.video_id,
+            metadata: {
+                title: video.title,
+                subject: video.subject,
+                classCode: video.class_code
+            }
+        }));
+
+        res.json(formattedVideos);
+    } catch (error) {
+        console.error('Error fetching videos:', error);
+        res.status(500).json({ message: 'Failed to fetch videos' });
+    }
+});
+
 // Video Viewing Functionality
 app.post('/videos/view', async (req, res) => {
     const videoId = req.body.id; // Get the video ID from the request body
