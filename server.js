@@ -86,7 +86,7 @@ const upload = multer({
 
 ////
 
-const cloudflareStreamApi = process.env.CLOUDFLARE_STREAM_API;
+const cloudflareStreamId = process.env.CLOUDFLARE_STREAM_ID;
 
 if (!cloudflareStreamApi) {
     console.error('CLOUDFLARE_STREAM_API is not defined');
@@ -96,6 +96,15 @@ if (!cloudflareStreamApi) {
 
 
 
+
+
+
+const cloudflareApiToken = process.env.CLOUDFLARE_STREAM_TOKEN;
+
+if (!cloudflareStreamApi || !cloudflareApiToken) {
+    console.error('Cloudflare Stream API configuration is not defined');
+    process.exit(1);
+}
 
 app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
     if (!req.file) {
@@ -119,13 +128,16 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
         const userId = userData.id;
 
         // Step 1: Request Direct Upload URL from Cloudflare
+        const endpoint = `https://api.cloudflare.com/client/v4/accounts/${cloudflareStreamId}/stream?direct_user=true`;
         const createUploadUrlResponse = await axios.post(
-            `${cloudflareStreamApi}/direct_upload`,
+            endpoint,
             {},
             {
                 headers: {
-                    Authorization: `Bearer ${process.env.CLOUDFLARE_STREAM_TOKEN}`,
-                    'Content-Type': 'application/json'
+                    Authorization: `Bearer ${cloudflareApiToken}`,
+                    'Tus-Resumable': '1.0.0',
+                    'Upload-Length': req.file.size,
+                    'Upload-Metadata': `filename ${Buffer.from(req.file.originalname).toString('base64')},filetype ${Buffer.from(req.file.mimetype).toString('base64')}`
                 },
             }
         );
@@ -135,7 +147,7 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
             return res.status(400).send('Failed to get upload URL from Cloudflare.');
         }
 
-        const uploadUrl = createUploadUrlResponse.data.result.uploadURL;
+        const uploadUrl = createUploadUrlResponse.headers['location'];
         const videoId = createUploadUrlResponse.data.result.uid;
 
         // Step 2: Convert Buffer to Stream (for tus)
@@ -190,6 +202,7 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
         return res.status(500).send(`Error uploading video: ${error.message}`);
     }
 });
+
 
 
 ///
