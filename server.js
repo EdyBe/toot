@@ -101,7 +101,7 @@ if (!cloudflareStreamId) {
 
 const cloudflareStreamToken = process.env.CLOUDFLARE_STREAM_TOKEN;
 
-if (!cloudflareStreamID || !cloudflareStreamToken) {
+if (!cloudflareStreamId || !cloudflareStreamToken) {
     console.error('Cloudflare Stream API configuration is not defined');
     process.exit(1);
 }
