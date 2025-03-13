@@ -173,14 +173,19 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
 
         // Step 1: Request Direct Upload URL from Cloudflare
         const endpoint = `https://api.cloudflare.com/client/v4/accounts/${cloudflareStreamId}/stream?direct_user=true`;
-        // Get video duration using ffprobe
-        const { execSync } = require('child_process');
-        let duration = 0;
-        try {
-            const ffprobeOutput = execSync(`ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 "${req.file.originalname}"`);
-            duration = parseFloat(ffprobeOutput.toString().trim());
-        } catch (error) {
-            console.error('Error getting video duration:', error);
+        // Set default duration (4 hours) since we can't get duration from in-memory file
+        let duration = 14400; // 4 hours in seconds
+        // Only try to get duration if file is on disk
+        if (req.file.path && fs.existsSync(req.file.path)) {
+            const { execSync } = require('child_process');
+            try {
+                const ffprobeOutput = execSync(
+                    `ffprobe -v error -show_entries format=duration -of default=nw=1:nk=1 "${req.file.path}"`
+                );
+                duration = parseFloat(ffprobeOutput.toString().trim()) || duration;
+            } catch (error) {
+                console.error('Error getting video duration:', error);
+            }
         }
 
         // Validate file properties
