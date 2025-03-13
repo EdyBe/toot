@@ -201,7 +201,11 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
             onProgress: function (bytesUploaded, bytesTotal) {
                 console.log(`Upload progress: ${bytesUploaded}/${bytesTotal} bytes`);
             },
+            onAfterResponse: function (req, res) {
+                console.log('TUS Response:', res.getStatus(), res.getHeader('Upload-Offset'));
+            },
             onSuccess: async function () {
+                console.log('TUS upload completed successfully');
                 try {
                     // Fetch video details from Cloudflare
                     const videoDetailsResponse = await axios.get(
@@ -640,8 +644,4 @@ app.post('/videos/view', async (req, res) => {
         console.error('Error marking video as viewed:', error);
         res.status(500).json({ message: 'Failed to mark video as viewed' });
     }
-});
-
-app.listen(port, () => {
-    console.log(`Server is running on port ${port}`);
 });
