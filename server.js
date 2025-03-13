@@ -178,6 +178,23 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
             },
             onSuccess: async function () {
                 try {
+                    // Fetch video details from Cloudflare
+                    const videoDetailsResponse = await axios.get(
+                        `https://api.cloudflare.com/client/v4/accounts/${cloudflareStreamId}/stream/${videoId}`,
+                        {
+                            headers: {
+                                Authorization: `Bearer ${cloudflareStreamToken}`
+                            }
+                        }
+                    );
+
+                    if (videoDetailsResponse.status !== 200) {
+                        console.error('Failed to fetch video details from Cloudflare:', videoDetailsResponse.data);
+                        return res.status(400).send('Failed to fetch video details from Cloudflare.');
+                    }
+
+                    const videoDetails = videoDetailsResponse.data.result;
+
                     const { data, error } = await supabase
                         .from('videos')
                         .insert([
@@ -188,6 +205,8 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
                                 created_at: new Date(),
                                 title: title,
                                 subject: subject,
+                                hls_manifest_url: videoDetails.playback.hls,
+                                dash_manifest_url: videoDetails.playback.dash
                             },
                         ]);
 
@@ -198,8 +217,8 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
                     return res.send({
                         message: 'File uploaded successfully to Cloudflare Stream and metadata stored in Supabase.',
                         videoId,
-                        hlsManifestUrl: createUploadUrlResponse.data.result.playback.hls,
-                        dashManifestUrl: createUploadUrlResponse.data.result.playback.dash
+                        hlsManifestUrl: videoDetails.playback.hls,
+                        dashManifestUrl: videoDetails.playback.dash
                     });
                 } catch (error) {
                     console.error('Error storing metadata in Supabase:', error);
@@ -214,7 +233,6 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
         return res.status(500).send(`Error uploading video: ${error.message}`);
     }
 });
-
 ///
 
 
