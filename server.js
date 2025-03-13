@@ -311,6 +311,18 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
 
                     const videoDetails = videoDetailsResponse.data.result;
 
+                    // Get user's school name
+                    const { data: userData, error: userError } = await supabase
+                        .from('users')
+                        .select('schoolName')
+                        .eq('id', userId)
+                        .single();
+
+                    if (userError || !userData) {
+                        console.error('Error fetching user school name:', userError);
+                        return res.status(400).send('Error fetching user information');
+                    }
+
                     const { data, error } = await supabase
                         .from('videos')
                         .insert([
@@ -321,6 +333,7 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
                                 created_at: new Date(),
                                 title: title,
                                 subject: subject,
+                                school_name: userData.schoolName,
                                 hls_manifest_url: videoDetails.playback.hls,
                                 dash_manifest_url: videoDetails.playback.dash
                             },
