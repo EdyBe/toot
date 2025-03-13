@@ -166,15 +166,25 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
 
         // Step 3: Upload Video Using tus
         const tusUpload = new tus.Upload(stream, {
-            endpoint: uploadUrl, // Set the correct upload URL
+            endpoint: uploadUrl,
+            retryDelays: [0, 1000, 3000, 5000],
+            headers: {
+                'Authorization': `Bearer ${cloudflareStreamToken}`,
+                'Tus-Resumable': '1.0.0',
+                'Upload-Metadata': `filename ${Buffer.from(req.file.originalname).toString('base64')},filetype ${Buffer.from(req.file.mimetype).toString('base64')}`
+            },
             metadata: {
                 filename: req.file.originalname,
                 filetype: req.file.mimetype,
             },
             uploadSize: req.file.size,
+            chunkSize: 5 * 1024 * 1024, // 5MB chunks
             onError: function (error) {
                 console.error('Error uploading video to Cloudflare Stream:', error);
                 return res.status(500).send('Error uploading video.');
+            },
+            onProgress: function (bytesUploaded, bytesTotal) {
+                console.log(`Upload progress: ${bytesUploaded}/${bytesTotal} bytes`);
             },
             onSuccess: async function () {
                 try {
@@ -235,6 +245,8 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
 });
 ///
 
+///
+
 
 
 
@@ -245,12 +257,12 @@ async function uploadVideoToCloudflare(videoPath, originalname) {
         const size = fs.statSync(videoPath).size;
         
 const options = {
-        endpoint: `https://api.cloudflare.com/client/v4/accounts/${cloudflareStreamId}/stream?direct_user=true`,
+        endpoint: `${cloudflareStreamApi}`,
 
         
 
             headers: {
-                Authorization: `Bearer ${cloudflareStreamToken}`,
+                'Authorization': `Bearer ${process.env.CLOUDFLARE_STREAM_TOKEN}`
             },
             metadata: {
                 filename: originalname,
