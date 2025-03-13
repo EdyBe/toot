@@ -248,7 +248,11 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
             'Access-Control-Allow-Origin': '*',
             'Location': uploadUrl
         });
-        const videoId = createUploadUrlResponse.data.result.uid;
+        const videoId = createUploadUrlResponse.data?.result?.uid;
+        if (!videoId) {
+            console.error('Failed to get video ID from Cloudflare response:', createUploadUrlResponse.data);
+            return res.status(400).send('Failed to get video ID from Cloudflare.');
+        }
 
         // Step 2: Convert Buffer to Stream (for tus)
         const stream = new PassThrough();
