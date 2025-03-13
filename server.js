@@ -183,25 +183,45 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
             console.error('Error getting video duration:', error);
         }
 
+        // Validate file properties
+        if (!req.file || !req.file.buffer || !req.file.originalname || !req.file.mimetype) {
+            throw new Error('Invalid file properties');
+        }
+
+        // Prepare TUS headers
+        const tusHeaders = {
+            'Authorization': `Bearer ${cloudflareStreamToken}`,
+            'Tus-Resumable': '1.0.0',
+            'Upload-Length': req.file.size.toString(),
+            'Upload-Metadata': `filename ${Buffer.from(req.file.originalname).toString('base64')},filetype ${Buffer.from(req.file.mimetype).toString('base64')}`,
+            'Content-Type': 'application/offset+octet-stream'
+        };
+
+        // Create upload URL
         const createUploadUrlResponse = await axios.post(
             endpoint,
             {
-                creator: email, // Creator's email
+                creator: email,
                 meta: {
                     name: req.file.originalname,
                     creator: email,
-                    duration: duration
+                    duration: duration,
+                    classCode: classCode,
+                    title: title,
+                    subject: subject
                 },
                 requireSignedURLs: false,
-                maxDurationSeconds: duration > 0 ? Math.ceil(duration) : 14400 // Default to 4 hours if duration not available
+                maxDurationSeconds: duration > 0 ? Math.ceil(duration) : 14400,
+                watermark: {
+                    uid: 'default_watermark',
+                    size: 0.1,
+                    position: 'bottom-right'
+                }
             },
             {
-                headers: {
-                    Authorization: `Bearer ${cloudflareStreamToken}`,
-                    'Tus-Resumable': '1.0.0',
-                    'Upload-Length': req.file.size,
-                    'Upload-Metadata': `filename ${Buffer.from(req.file.originalname).toString('base64')},filetype ${Buffer.from(req.file.mimetype).toString('base64')}`
-                },
+                headers: tusHeaders,
+                maxBodyLength: Infinity,
+                maxContentLength: Infinity
             }
         );
 
