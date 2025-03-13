@@ -17,23 +17,124 @@
     <div class="card">
         <div class="upload-container">
             <h2>Upload Video</h2>
-            <form id="uploadForm" action="/upload" method="POST" enctype="multipart/form-data">
-                <input type="hidden" name="email" id="userEmail"> <!-- Hidden email field -->
-                <input type="text" name="title" placeholder="Video Title" required>
-                <input type="text" name="subject" placeholder="Subject" required>
-                <label for="classCode">Select Class Code:</label>
-                <select id="classCode" name="classCode">
-                    <!-- Options will be populated dynamically -->
-                </select>
-                <input type="file" id="videoFile" name="video" accept="video/*" required>
-                <button type="submit">Upload Video</button>
-                <p class="error-message" id="uploadErrorMessage"></p>
-            </form>
+            <div id="drag-drop-area"></div>
+            <div class="for-ProgressBar"></div>
+            <input type="hidden" id="userEmail">
+            <input type="text" id="videoTitle" placeholder="Video Title" required>
+            <input type="text" id="videoSubject" placeholder="Subject" required>
+            <label for="classCode">Select Class Code:</label>
+            <select id="classCode">
+                <!-- Options will be populated dynamically -->
+            </select>
+            <button class="upload-button">Upload Video</button>
+            <p class="error-message" id="uploadErrorMessage"></p>
+            <div class="uploaded-files">
+                <ol></ol>
+            </div>
         </div>
-    </div>    
-    
-    <script>
+    </div>
+
+    <script type="module">
+        import {
+            Uppy,
+            Tus,
+            DragDrop,
+            ProgressBar,
+        } from "https://releases.transloadit.com/uppy/v3.0.1/uppy.min.mjs";
+
         document.addEventListener('DOMContentLoaded', async () => {
+            // Populate the hidden email field from session storage
+            const userEmail = sessionStorage.getItem('userEmail');
+            if (userEmail) {
+                document.getElementById('userEmail').value = userEmail;
+            } else {
+                console.error('User email not found in session storage');
+                return;
+            }
+
+            // Fetch class codes from the server
+            async function fetchClassCodes() {
+                try {
+                    const response = await fetch(`/class-codes?email=${encodeURIComponent(userEmail)}`);
+                    if (!response.ok) {
+                        throw new Error('Failed to fetch class codes');
+                    }
+
+                    const data = await response.json();
+                    const classCodes = data.classCodes;
+                    const classCodeSelect = document.getElementById('classCode');
+
+                    // Clear existing options
+                    classCodeSelect.innerHTML = '';
+
+                    classCodes.forEach(code => {
+                        const option = document.createElement('option');
+                        option.value = code;
+                        option.textContent = code;
+                        classCodeSelect.appendChild(option);
+                    });
+                } catch (error) {
+                    console.error('Error fetching class codes:', error);
+                    alert('Failed to load class codes. Please try again later.');
+                }
+            }
+
+            // Initialize Uppy
+            const uppy = new Uppy({ debug: true, autoProceed: false });
+
+            const onUploadSuccess = (el) => (file, response) => {
+                const li = document.createElement("li");
+                const a = document.createElement("a");
+                a.href = response.uploadURL;
+                a.target = "_blank";
+                a.appendChild(document.createTextNode(file.name));
+                li.appendChild(a);
+
+                document.querySelector(el).appendChild(li);
+            };
+
+            uppy
+                .use(DragDrop, { target: "#drag-drop-area" })
+                .use(Tus, {
+                    endpoint: "/api/get-upload-url",
+                    chunkSize: 150 * 1024 * 1024,
+                    onBeforeRequest: (req) => {
+                        const email = document.getElementById('userEmail').value;
+                        const title = document.getElementById('videoTitle').value;
+                        const subject = document.getElementById('videoSubject').value;
+                        const classCode = document.getElementById('classCode').value;
+
+                        req.setHeader('X-Email', email);
+                        req.setHeader('X-Title', title);
+                        req.setHeader('X-Subject', subject);
+                        req.setHeader('X-ClassCode', classCode);
+                    }
+                })
+                .use(ProgressBar, {
+                    target: ".for-ProgressBar",
+                    hideAfterFinish: false,
+                })
+                .on("upload-success", onUploadSuccess(".uploaded-files ol"));
+
+            const uploadBtn = document.querySelector("button.upload-button");
+            uploadBtn.addEventListener("click", () => {
+                const email = document.getElementById('userEmail').value;
+                const title = document.getElementById('videoTitle').value;
+                const subject = document.getElementById('videoSubject').value;
+                const classCode = document.getElementById('classCode').value;
+
+                if (!email || !title || !subject || !classCode) {
+                    document.getElementById('uploadErrorMessage').textContent = 'Please fill all fields';
+                    return;
+                }
+
+                uppy.upload();
+            });
+
+            // Call the function to fetch class codes on page load
+            fetchClassCodes();
+        });
+        
             // Populate the hidden email field from session storage
             const userEmail = sessionStorage.getItem('userEmail');
             if (userEmail) {
@@ -59,32 +160,7 @@
                 }
             }
 
-            // Fetch class codes from the server
-            async function fetchClassCodes() {
-                try {
-                    const response = await fetch(`/class-codes?email=${encodeURIComponent(userEmail)}`); // Endpoint to get class codes
-                    if (!response.ok) {
-                        throw new Error('Failed to fetch class codes');
-                    }
-
-                    const data = await response.json();
-                    const classCodes = data.classCodes; // Extract class codes from the response
-                    const classCodeSelect = document.querySelector('select[name="classCode"]');
-
-                    // Clear existing options
-                    classCodeSelect.innerHTML = '';
-
-                    classCodes.forEach(code => {
-                        const option = document.createElement('option');
-                        option.value = code;
-                        option.textContent = code;
-                        classCodeSelect.appendChild(option);
-                    });
-                } catch (error) {
-                    console.error('Error fetching class codes:', error);
-                    alert('Failed to load class codes. Please try again later.');
-                }
-            }
+           
 
             // Call the function to fetch class codes on page load
             fetchClassCodes();
