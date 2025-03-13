@@ -106,6 +106,16 @@ if (!cloudflareStreamId || !cloudflareStreamToken) {
     process.exit(1);
 }
 
+// ...existing code...
+
+
+
+
+if (!cloudflareStreamId || !cloudflareStreamToken) {
+    console.error('Cloudflare Stream API configuration is not defined');
+    process.exit(1);
+}
+
 app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
     if (!req.file) {
         return res.status(400).send('No file uploaded.');
@@ -203,6 +213,7 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
     }
 });
 
+// ...existing code...
 
 
 ///
