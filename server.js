@@ -116,6 +116,40 @@ if (!cloudflareStreamId || !cloudflareStreamToken) {
     process.exit(1);
 }
 
+// Endpoint to get upload URL
+app.post('/api/get-upload-url', async (req, res) => {
+    try {
+        const endpoint = `https://api.cloudflare.com/client/v4/accounts/${cloudflareStreamId}/stream?direct_user=true`;
+        
+        const response = await fetch(endpoint, {
+            method: "POST",
+            headers: {
+                Authorization: `bearer ${cloudflareStreamToken}`,
+                "Tus-Resumable": "1.0.0",
+                "Upload-Length": req.headers['upload-length'],
+                "Upload-Metadata": req.headers['upload-metadata']
+            }
+        });
+
+        if (!response.ok) {
+            throw new Error(`Failed to get upload URL: ${response.statusText}`);
+        }
+
+        const destination = response.headers.get('Location');
+        
+        res.set({
+            'Access-Control-Expose-Headers': 'Location',
+            'Access-Control-Allow-Headers': '*',
+            'Access-Control-Allow-Origin': '*',
+            'Location': destination
+        }).send();
+    } catch (error) {
+        console.error('Error getting upload URL:', error);
+        res.status(500).send('Error getting upload URL');
+    }
+});
+
+// Existing upload endpoint
 app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
     if (!req.file) {
         return res.status(400).send('No file uploaded.');
