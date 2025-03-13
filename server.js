@@ -88,8 +88,8 @@ const upload = multer({
 
 const cloudflareStreamId = process.env.CLOUDFLARE_STREAM_ID;
 
-if (!cloudflareStreamApi) {
-    console.error('CLOUDFLARE_STREAM_API is not defined');
+if (!cloudflareStreamId) {
+    console.error('CLOUDFLARE_STREAM_ID is not defined');
     process.exit(1);
 }
 
