@@ -198,6 +198,8 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
                     return res.send({
                         message: 'File uploaded successfully to Cloudflare Stream and metadata stored in Supabase.',
                         videoId,
+                        hlsManifestUrl: createUploadUrlResponse.data.result.playback.hls,
+                        dashManifestUrl: createUploadUrlResponse.data.result.playback.dash
                     });
                 } catch (error) {
                     console.error('Error storing metadata in Supabase:', error);
@@ -212,9 +214,6 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
         return res.status(500).send(`Error uploading video: ${error.message}`);
     }
 });
-
-// ...existing code...
-
 
 ///
 
