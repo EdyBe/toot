@@ -138,10 +138,17 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
         const userId = userData.id;
 
         // Step 1: Request Direct Upload URL from Cloudflare
-        const endpoint = `https://api.cloudflare.com/client/v4/accounts/${cloudflareStreamId}/stream/direct_upload`;
+        const endpoint = `https://api.cloudflare.com/client/v4/accounts/${cloudflareStreamId}/stream?direct_user=true`;
         const createUploadUrlResponse = await axios.post(
             endpoint,
-            {},
+            {
+                creator: email, // Creator's email
+                meta: {
+                    name: req.file.originalname,
+                    creator: email
+                },
+                requireSignedURLs: false
+            },
             {
                 headers: {
                     Authorization: `Bearer ${cloudflareStreamToken}`,
