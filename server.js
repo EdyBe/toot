@@ -645,3 +645,7 @@ app.post('/videos/view', async (req, res) => {
         res.status(500).json({ message: 'Failed to mark video as viewed' });
     }
 });
+
+app.listen(port, () => {
+    console.log(`Server is running on port ${port}`);
+});
