@@ -230,7 +230,7 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
             }
         );
 
-        if (createUploadUrlResponse.status !== 200) {
+        if (createUploadUrlResponse.status !== 200 && createUploadUrlResponse.status !== 201) {
             console.error('Failed to get upload URL from Cloudflare:', {
                 status: createUploadUrlResponse.status,
                 data: createUploadUrlResponse.data,
