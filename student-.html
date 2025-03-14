@@ -98,10 +98,12 @@ dropdownContent.addEventListener('mouseleave', function() {
             const videoItem = document.createElement('div');
             videoItem.className = 'video-item';
 
-            const videoPlayer = document.createElement('video');
-            videoPlayer.controls = true;
-            videoPlayer.src = video.metadata.hlsUrl;
-            videoPlayer.type = 'application/x-mpegURL';
+            const videoPlayer = document.createElement('div');
+            videoPlayer.className = 'cf-stream-player';
+            videoPlayer.setAttribute('data-id', video._id);
+            videoPlayer.setAttribute('data-account', '983d66785205f145807f52ff07d135a8');
+            videoPlayer.style.width = '150px';
+            videoPlayer.style.height = '150px';
 
             const title = document.createElement('h3');
             title.className = 'video-title';
@@ -250,5 +252,15 @@ dropdownContent.addEventListener('mouseleave', function() {
         });
     </script>
     <script src="script.js"></script>
+    <script src="https://embed.cloudflarestream.com/embed/r4xu.fla9.latest.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const players = Array.from(document.querySelectorAll('.cf-stream-player'));
+            players.forEach(player => {
+                const stream = new Stream(player);
+                stream.play();
+            });
+        });
+    </script>
 </body>
 </html>
