@@ -103,13 +103,13 @@ dropdownContent.addEventListener('mouseleave', function() {
             videoPlayerContainer.style.paddingTop = '56.25%'; // 16:9 aspect ratio
             
             const videoPlayer = document.createElement('iframe');
-            videoPlayer.src = `https://customer-983d66785205f145807f52ff07d135a8.cloudflarestream.com/${video._id}/iframe`;
+            videoPlayer.src = `https://iframe.cloudflarestream.com/${video._id}`;
             videoPlayer.style.border = 'none';
             videoPlayer.style.position = 'absolute';
             videoPlayer.style.top = '0';
             videoPlayer.style.height = '100%';
             videoPlayer.style.width = '100%';
-            videoPlayer.allow = 'accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture;';
+            videoPlayer.allow = 'autoplay; fullscreen;';
             videoPlayer.allowFullscreen = true;
             
             videoPlayerContainer.appendChild(videoPlayer);
@@ -137,7 +137,6 @@ dropdownContent.addEventListener('mouseleave', function() {
             videoItem.appendChild(deleteButton);
 
             folderContent.appendChild(videoItem);
-            // No need to call load() for iframe
         }
 
         function filterAndDisplayVideos(videos, folderContent, searchTerm = '') {
@@ -261,6 +260,5 @@ dropdownContent.addEventListener('mouseleave', function() {
         });
     </script>
     <script src="script.js"></script>
-    <!-- Removed Cloudflare Stream player script as we're using iframe now -->
 </body>
 </html>
