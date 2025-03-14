@@ -153,7 +153,7 @@ dropdownContent.addEventListener('mouseleave', function() {
             videoPlayer.addEventListener('fullscreenchange', updateFullscreenButton);
             videoPlayer.addEventListener('webkitfullscreenchange', updateFullscreenButton);
             videoPlayer.addEventListener('mozfullscreenchange', updateFullscreenButton);
-            videoPlayer.addEventListener('MSFullscreenChange', updateFullscreenChange);
+            videoPlayer.addEventListener('MSFullscreenChange', updateFullscreenButton);
             videoPlayer.src = `https://iframe.cloudflarestream.com/${video._id}`;
             videoPlayer.style.border = 'none';
             videoPlayer.style.position = 'absolute';
