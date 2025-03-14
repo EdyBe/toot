@@ -120,8 +120,6 @@ dropdownContent.addEventListener('mouseleave', function() {
                         } else if (iframe.msRequestFullscreen) { // IE/Edge
                             iframe.msRequestFullscreen();
                         }
-                        // Immediately update button state
-                        fullscreenButton.innerHTML = '<i class="fas fa-compress"></i>';
                     } else {
                         if (document.exitFullscreen) {
                             document.exitFullscreen();
@@ -132,8 +130,6 @@ dropdownContent.addEventListener('mouseleave', function() {
                         } else if (document.msExitFullscreen) { // IE/Edge
                             document.msExitFullscreen();
                         }
-                        // Immediately update button state
-                        fullscreenButton.innerHTML = '<i class="fas fa-expand"></i>';
                     }
                 }
             };
