@@ -138,12 +138,16 @@ dropdownContent.addEventListener('mouseleave', function() {
 
             fullscreenButton.onclick = toggleFullscreen;
 
-            // Handle fullscreen change events
-            document.addEventListener('fullscreenchange', () => {
-                if (!document.fullscreenElement) {
+            // Handle fullscreen change events for this specific video player
+            const handleFullscreenChange = () => {
+                if (document.fullscreenElement === videoPlayer) {
+                    fullscreenButton.innerHTML = '<i class="fas fa-compress"></i>';
+                } else {
                     fullscreenButton.innerHTML = '<i class="fas fa-expand"></i>';
                 }
-            });
+            };
+
+            videoPlayer.addEventListener('fullscreenchange', handleFullscreenChange);
             
             const videoPlayer = document.createElement('iframe');
             videoPlayer.src = `https://iframe.cloudflarestream.com/${video._id}`;
