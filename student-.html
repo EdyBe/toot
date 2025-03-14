@@ -102,6 +102,25 @@ dropdownContent.addEventListener('mouseleave', function() {
             videoPlayerContainer.style.position = 'relative';
             videoPlayerContainer.style.paddingTop = '56.25%'; // 16:9 aspect ratio
             
+            // Add fullscreen button
+            const fullscreenButton = document.createElement('button');
+            fullscreenButton.className = 'fullscreen-button';
+            fullscreenButton.innerHTML = '<i class="fas fa-expand"></i>';
+            fullscreenButton.onclick = () => {
+                const iframe = videoPlayerContainer.querySelector('iframe');
+                if (iframe) {
+                    if (iframe.requestFullscreen) {
+                        iframe.requestFullscreen();
+                    } else if (iframe.mozRequestFullScreen) { // Firefox
+                        iframe.mozRequestFullScreen();
+                    } else if (iframe.webkitRequestFullscreen) { // Chrome, Safari and Opera
+                        iframe.webkitRequestFullscreen();
+                    } else if (iframe.msRequestFullscreen) { // IE/Edge
+                        iframe.msRequestFullscreen();
+                    }
+                }
+            };
+            
             const videoPlayer = document.createElement('iframe');
             videoPlayer.src = `https://iframe.cloudflarestream.com/${video._id}`;
             videoPlayer.style.border = 'none';
@@ -114,6 +133,7 @@ dropdownContent.addEventListener('mouseleave', function() {
             videoPlayer.allowFullscreen = true;
             
             videoPlayerContainer.appendChild(videoPlayer);
+            videoPlayerContainer.appendChild(fullscreenButton);
 
             const title = document.createElement('h3');
             title.className = 'video-title';
