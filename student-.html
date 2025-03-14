@@ -106,20 +106,44 @@ dropdownContent.addEventListener('mouseleave', function() {
             const fullscreenButton = document.createElement('button');
             fullscreenButton.className = 'fullscreen-button';
             fullscreenButton.innerHTML = '<i class="fas fa-expand"></i>';
-            fullscreenButton.onclick = () => {
+            
+            const toggleFullscreen = () => {
                 const iframe = videoPlayerContainer.querySelector('iframe');
                 if (iframe) {
-                    if (iframe.requestFullscreen) {
-                        iframe.requestFullscreen();
-                    } else if (iframe.mozRequestFullScreen) { // Firefox
-                        iframe.mozRequestFullScreen();
-                    } else if (iframe.webkitRequestFullscreen) { // Chrome, Safari and Opera
-                        iframe.webkitRequestFullscreen();
-                    } else if (iframe.msRequestFullscreen) { // IE/Edge
-                        iframe.msRequestFullscreen();
+                    if (!document.fullscreenElement) {
+                        if (iframe.requestFullscreen) {
+                            iframe.requestFullscreen();
+                        } else if (iframe.mozRequestFullScreen) { // Firefox
+                            iframe.mozRequestFullScreen();
+                        } else if (iframe.webkitRequestFullscreen) { // Chrome, Safari and Opera
+                            iframe.webkitRequestFullscreen();
+                        } else if (iframe.msRequestFullscreen) { // IE/Edge
+                            iframe.msRequestFullscreen();
+                        }
+                        fullscreenButton.innerHTML = '<i class="fas fa-compress"></i>';
+                    } else {
+                        if (document.exitFullscreen) {
+                            document.exitFullscreen();
+                        } else if (document.mozCancelFullScreen) { // Firefox
+                            document.mozCancelFullScreen();
+                        } else if (document.webkitExitFullscreen) { // Chrome, Safari and Opera
+                            document.webkitExitFullscreen();
+                        } else if (document.msExitFullscreen) { // IE/Edge
+                            document.msExitFullscreen();
+                        }
+                        fullscreenButton.innerHTML = '<i class="fas fa-expand"></i>';
                     }
                 }
             };
+
+            fullscreenButton.onclick = toggleFullscreen;
+
+            // Handle fullscreen change events
+            document.addEventListener('fullscreenchange', () => {
+                if (!document.fullscreenElement) {
+                    fullscreenButton.innerHTML = '<i class="fas fa-expand"></i>';
+                }
+            });
             
             const videoPlayer = document.createElement('iframe');
             videoPlayer.src = `https://iframe.cloudflarestream.com/${video._id}`;
