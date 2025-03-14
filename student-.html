@@ -100,9 +100,8 @@ dropdownContent.addEventListener('mouseleave', function() {
 
             const videoPlayer = document.createElement('video');
             videoPlayer.controls = true;
-            const videoId = video._id;
-            videoPlayer.src = `/videos.files/${videoId}`;
-            videoPlayer.type = video.metadata.contentType;
+            videoPlayer.src = video.metadata.hlsUrl;
+            videoPlayer.type = 'application/x-mpegURL';
 
             const title = document.createElement('h3');
             title.className = 'video-title';
@@ -111,6 +110,10 @@ dropdownContent.addEventListener('mouseleave', function() {
             const subject = document.createElement('p');
             subject.className = 'video-subject';
             subject.innerText = video.metadata.subject;
+
+            const date = document.createElement('p');
+            date.className = 'video-date';
+            date.innerText = new Date(video.metadata.createdAt).toLocaleDateString();
 
             const deleteButton = document.createElement('button');
             deleteButton.className = 'delete-button';
