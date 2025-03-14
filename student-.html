@@ -138,6 +138,8 @@ dropdownContent.addEventListener('mouseleave', function() {
 
             fullscreenButton.onclick = toggleFullscreen;
 
+            const videoPlayer = document.createElement('iframe');
+            
             // Handle fullscreen change events for this specific video player
             const handleFullscreenChange = () => {
                 if (document.fullscreenElement === videoPlayer) {
@@ -148,8 +150,6 @@ dropdownContent.addEventListener('mouseleave', function() {
             };
 
             videoPlayer.addEventListener('fullscreenchange', handleFullscreenChange);
-            
-            const videoPlayer = document.createElement('iframe');
             videoPlayer.src = `https://iframe.cloudflarestream.com/${video._id}`;
             videoPlayer.style.border = 'none';
             videoPlayer.style.position = 'absolute';
