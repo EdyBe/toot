@@ -732,16 +732,26 @@ app.get('/videos', async (req, res) => {
             return res.status(400).json({ message: 'Email is required' });
         }
 
-        // Get user details and associated videos
-        const { user, videos } = await readUser(email);
-        
+        // Get videos associated with the user's email
+        const { data: videos, error } = await supabase
+            .from('videos')
+            .select('*')
+            .eq('user_email', email);
+
+        if (error) {
+            throw error;
+        }
+
         // Format videos for frontend
         const formattedVideos = videos.map(video => ({
             _id: video.video_id,
             metadata: {
                 title: video.title,
                 subject: video.subject,
-                classCode: video.class_code
+                classCode: video.class_code,
+                createdAt: video.created_at,
+                hlsUrl: video.hls_manifest_url,
+                dashUrl: video.dash_manifest_url
             }
         }));
 
