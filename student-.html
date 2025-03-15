@@ -107,6 +107,11 @@ dropdownContent.addEventListener('mouseleave', function() {
         fullscreenButton.className = 'fullscreen-button';
         fullscreenButton.innerHTML = '<i class="fas fa-expand"></i>';
 
+        // Add minimize button
+        const minimizeButton = document.createElement('button');
+        minimizeButton.className = 'minimize-button';
+        minimizeButton.innerHTML = '<i class="fas fa-compress"></i>';
+        minimizeButton.style.display = 'none';
 
         const videoPlayer = document.createElement('iframe');
 
@@ -142,6 +147,7 @@ dropdownContent.addEventListener('mouseleave', function() {
         };
 
         fullscreenButton.onclick = toggleFullscreen;
+        minimizeButton.onclick = toggleFullscreen;
 
         videoPlayer.src = `https://iframe.cloudflarestream.com/${video._id}`;
         videoPlayer.style.border = 'none';
@@ -155,6 +161,7 @@ dropdownContent.addEventListener('mouseleave', function() {
 
         videoPlayerContainer.appendChild(videoPlayer);
         videoPlayerContainer.appendChild(fullscreenButton);
+        videoPlayerContainer.appendChild(minimizeButton);
 
         const title = document.createElement('h3');
         title.className = 'video-title';
@@ -182,14 +189,24 @@ dropdownContent.addEventListener('mouseleave', function() {
 
         // Update icon when fullscreen state changes
         document.addEventListener('fullscreenchange', () => {
-            const fullscreenButton = document.querySelector('.fullscreen-button');
+            const fullscreenButton = videoPlayerContainer.querySelector('.fullscreen-button');
+            const minimizeButton = videoPlayerContainer.querySelector('.minimize-button');
+            
             if (document.fullscreenElement) {
-                fullscreenButton.innerHTML = '<i class="fas fa-compress"></i>';
+                fullscreenButton.style.display = 'none';
+                minimizeButton.style.display = 'flex';
             } else {
-                fullscreenButton.innerHTML = '<i class="fas fa-expand"></i>';
+                fullscreenButton.style.display = 'flex';
+                minimizeButton.style.display = 'none';
             }
         });
 
+        // Handle ESC key press to exit fullscreen
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && document.fullscreenElement) {
+                document.exitFullscreen();
+            }
+        });
 
         }
 
@@ -303,16 +320,3 @@ dropdownContent.addEventListener('mouseleave', function() {
                             const openClassContent = document.querySelector('.folder.active + .folder-content');
                             if (openClassContent) {
                                 filterAndDisplayVideos(currentClassVideos, openClassContent, searchTerm);
-                            }
-                        }
-                    });
-                })
-                .catch(error => {
-                    console.error('Error fetching videos:', error);
-                    document.getElementById('videoErrorMessage').innerText = 'Failed to load videos.';
-                });
-        });
-    </script>
-    <script src="script.js"></script>
-</body>
-</html>
