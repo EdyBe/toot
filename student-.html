@@ -153,9 +153,11 @@ dropdownContent.addEventListener('mouseleave', function() {
                 if (document.fullscreenElement === videoPlayer) {
                     fullscreenButton.innerHTML = '<i class="fas fa-compress"></i>';
                     fullscreenButton.style.display = 'block';
+                    console.log('Fullscreen mode - showing compress icon');
                 } else {
                     fullscreenButton.innerHTML = '<i class="fas fa-expand"></i>';
                     fullscreenButton.style.display = 'block';
+                    console.log('Normal mode - showing expand icon');
                 }
             };
 
