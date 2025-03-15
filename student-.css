@@ -328,5 +328,54 @@ p{
     padding-top: 0;
 }
 
+/* Minimize button styles */
+.minimize-button {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+    background: rgba(0, 0, 0, 0.7);
+    border: none;
+    color: white;
+    padding: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    z-index: 10;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+}
 
+.minimize-button:hover {
+    background: rgba(0, 0, 0, 0.9);
+}
 
+:fullscreen .minimize-button {
+    position: fixed;
+    bottom: 20px;
+    left: 20px;
+    z-index: 10000;
+    background: rgba(0, 0, 0, 0.8);
+    transition: background 0.3s ease;
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+:fullscreen .minimize-button:hover {
+    background: rgba(0, 0, 0, 0.9);
+}
+
+:fullscreen .minimize-button i {
+    transform: scale(1.2);
+    color: #fff;
+    transition: transform 0.3s ease;
+}
