@@ -304,10 +304,22 @@ const capitalizedFirstName = firstName.charAt(0).toUpperCase() + firstName.slice
                     return response.json();
                 })
                 .then(teacher => {
+                    console.log('Teacher details:', teacher);
+                    
                     // Update welcome message
                     if (teacher.firstName) {
                         document.getElementById('firstNameInitial').innerText = teacher.firstName.charAt(0).toUpperCase();
                         document.getElementById('firstName').innerText = `Welcome ${teacher.firstName}`;
+                    }
+
+                    // Verify required fields exist
+                    if (!teacher.school_name || !teacher.class_code) {
+                        console.error('Missing required teacher details:', {
+                            school_name: teacher.school_name,
+                            class_code: teacher.class_code
+                        });
+                        document.getElementById('videoErrorMessage').innerText = 'Teacher details incomplete. Please contact support.';
+                        return;
                     }
 
                     // Fetch videos filtered by teacher's school_name and class_code
