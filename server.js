@@ -732,11 +732,32 @@ app.get('/videos', async (req, res) => {
             return res.status(400).json({ message: 'Email is required' });
         }
 
-        // Get videos associated with the user's email
-        const { data: videos, error } = await supabase
+        // Get user details to determine account type
+        const { data: user, error: userError } = await supabase
+            .from('users')
+            .select('accountType, schoolName, classCodesArray')
+            .eq('email', email)
+            .single();
+
+        if (userError || !user) {
+            throw userError || new Error('User not found');
+        }
+
+        let query = supabase
             .from('videos')
-            .select('*')
-            .eq('user_email', email);
+            .select('*');
+
+        if (user.accountType === 'teacher') {
+            // For teachers, filter by school name and class codes
+            query = query
+                .eq('school_name', user.schoolName)
+                .in('class_code', user.classCodesArray);
+        } else {
+            // For students, filter by user email
+            query = query.eq('user_email', email);
+        }
+
+        const { data: videos, error } = await query;
 
         if (error) {
             throw error;
