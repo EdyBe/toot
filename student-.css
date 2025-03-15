@@ -361,8 +361,17 @@ p{
     border-radius: 4px;
     cursor: pointer;
     z-index: 1001;
+    display: none;
 }
 
 .minimize-button:hover {
     background: rgba(0, 0, 0, 0.7);
+}
+
+:fullscreen .minimize-button {
+    display: block;
+}
+
+:fullscreen .fullscreen-button {
+    display: none;
 }
