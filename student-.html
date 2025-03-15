@@ -152,8 +152,10 @@ dropdownContent.addEventListener('mouseleave', function() {
             const updateFullscreenButton = () => {
                 if (document.fullscreenElement === videoPlayer) {
                     fullscreenButton.innerHTML = '<i class="fas fa-compress"></i>';
+                    fullscreenButton.style.display = 'block';
                 } else {
                     fullscreenButton.innerHTML = '<i class="fas fa-expand"></i>';
+                    fullscreenButton.style.display = 'block';
                 }
             };
 
