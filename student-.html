@@ -106,6 +106,8 @@ dropdownContent.addEventListener('mouseleave', function() {
             const fullscreenButton = document.createElement('button');
             fullscreenButton.className = 'fullscreen-button';
             fullscreenButton.innerHTML = '<i class="fas fa-expand"></i>';
+
+            const videoPlayer = document.createElement('iframe');
             
             const updateFullscreenIcon = () => {
                 const isFullscreen = document.fullscreenElement === videoPlayer;
@@ -147,10 +149,7 @@ dropdownContent.addEventListener('mouseleave', function() {
 
             // Initialize icon state
             updateFullscreenIcon();
-
             fullscreenButton.onclick = toggleFullscreen;
-
-            const videoPlayer = document.createElement('iframe');
             
             // Update icon state on fullscreen changes
             videoPlayer.addEventListener('fullscreenchange', updateFullscreenIcon);
