@@ -344,10 +344,18 @@ p{
     bottom: 20px;
     right: 20px;
     z-index: 10000;
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.8);
     transition: background 0.3s ease;
+    display: block !important;
+    opacity: 1 !important;
+    visibility: visible !important;
 }
 
 :fullscreen .fullscreen-button:hover {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 1);
+}
+
+:fullscreen .fullscreen-button i {
+    transform: scale(1.5);
+    color: #000;
 }
