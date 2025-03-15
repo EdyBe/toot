@@ -111,34 +111,28 @@ dropdownContent.addEventListener('mouseleave', function() {
                 const iframe = videoPlayerContainer.querySelector('iframe');
                 if (iframe) {
                     if (!document.fullscreenElement) {
+                        // Enter fullscreen
                         if (iframe.requestFullscreen) {
-                            iframe.requestFullscreen().then(() => {
-                                fullscreenButton.innerHTML = '<i class="fas fa-compress"></i>';
-                            });
-                        } else if (iframe.mozRequestFullScreen) { // Firefox
-                            iframe.mozRequestFullScreen();
-                            fullscreenButton.innerHTML = '<i class="fas fa-compress"></i>';
-                        } else if (iframe.webkitRequestFullscreen) { // Chrome, Safari and Opera
-                            iframe.webkitRequestFullscreen();
-                            fullscreenButton.innerHTML = '<i class="fas fa-compress"></i>';
-                        } else if (iframe.msRequestFullscreen) { // IE/Edge
-                            iframe.msRequestFullscreen();
-                            fullscreenButton.innerHTML = '<i class="fas fa-compress"></i>';
+                            iframe.requestFullscreen()
+                                .then(() => {
+                                    fullscreenButton.innerHTML = '<i class="fas fa-compress"></i>';
+                                    console.log('Entered fullscreen mode');
+                                })
+                                .catch(err => {
+                                    console.error('Error entering fullscreen:', err);
+                                });
                         }
                     } else {
+                        // Exit fullscreen
                         if (document.exitFullscreen) {
-                            document.exitFullscreen().then(() => {
-                                fullscreenButton.innerHTML = '<i class="fas fa-expand"></i>';
-                            });
-                        } else if (document.mozCancelFullScreen) { // Firefox
-                            document.mozCancelFullScreen();
-                            fullscreenButton.innerHTML = '<i class="fas fa-expand"></i>';
-                        } else if (document.webkitExitFullscreen) { // Chrome, Safari and Opera
-                            document.webkitExitFullscreen();
-                            fullscreenButton.innerHTML = '<i class="fas fa-expand"></i>';
-                        } else if (document.msExitFullscreen) { // IE/Edge
-                            document.msExitFullscreen();
-                            fullscreenButton.innerHTML = '<i class="fas fa-expand"></i>';
+                            document.exitFullscreen()
+                                .then(() => {
+                                    fullscreenButton.innerHTML = '<i class="fas fa-expand"></i>';
+                                    console.log('Exited fullscreen mode');
+                                })
+                                .catch(err => {
+                                    console.error('Error exiting fullscreen:', err);
+                                });
                         }
                     }
                 }
