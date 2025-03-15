@@ -328,7 +328,7 @@ p{
     padding-top: 0;
 }
 
-/* Minimize button styles */
+* Minimize button styles */
 .minimize-button {
     position: absolute;
     bottom: 10px;
@@ -341,7 +341,7 @@ p{
     cursor: pointer;
     z-index: 10;
     transition: all 0.3s ease;
-    display: flex;
+    display: none;
     align-items: center;
     justify-content: center;
     width: 32px;
@@ -352,6 +352,10 @@ p{
     background: rgba(0, 0, 0, 0.9);
 }
 
+:fullscreen .fullscreen-button {
+    display: none;
+}
+
 :fullscreen .minimize-button {
     position: fixed;
     bottom: 20px;
@@ -359,15 +363,12 @@ p{
     z-index: 10000;
     background: rgba(0, 0, 0, 0.8);
     transition: background 0.3s ease;
-    display: block !important;
+    display: flex !important;
     opacity: 1 !important;
     visibility: visible !important;
     width: 40px;
     height: 40px;
     border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
 }
 
 :fullscreen .minimize-button:hover {
