@@ -93,6 +93,7 @@ dropdownContent.addEventListener('mouseenter', function() {
 dropdownContent.addEventListener('mouseleave', function() {
     dropdownContent.style.display = "none";
 });
+
     function createVideoItem(video, folderContent) {
         const videoItem = document.createElement('div');
         videoItem.className = 'video-item';
@@ -177,6 +178,18 @@ dropdownContent.addEventListener('mouseleave', function() {
         videoItem.appendChild(deleteButton);
 
         folderContent.appendChild(videoItem);
+
+
+    document.addEventListener('fullscreenchange', () => {
+        const fullscreenButton = document.querySelector('.fullscreen-button');
+        if (document.fullscreenElement) {
+            fullscreenButton.innerHTML = '<i class="fas fa-compress"></i>';
+        } else {
+            fullscreenButton.innerHTML = '<i class="fas fa-expand"></i>';
+        }
+    });
+
+
         }
 
         function filterAndDisplayVideos(videos, folderContent, searchTerm = '') {
