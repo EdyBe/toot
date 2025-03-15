@@ -247,17 +247,3 @@ if (signOutButton) {
     } });
 
 
-    const TfetchVideos = async (schoolName, classCode) => {
-        const { data, error } = await supabase
-          .from('videos')
-          .select('video_id, manifest_url, title')
-          .eq('school_name', schoolName)
-          .eq('class_code', classCode)
-      
-        if (error) {
-          console.error('Error fetching videos:', error)
-          return []
-        }
-      
-        return data
-      }
