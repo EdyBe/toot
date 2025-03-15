@@ -313,17 +313,17 @@ const capitalizedFirstName = firstName.charAt(0).toUpperCase() + firstName.slice
                     }
 
                     // Verify required fields exist
-                    if (!teacher.schoolName || !teacher.classCodesArray || teacher.classCodesArray.length === 0) {
+                    if (!teacher.schoolName || !teacher.classCodes || teacher.classCodes.length === 0) {
                         console.error('Missing required teacher details:', {
                             schoolName: teacher.schoolName,
-                            classCodesArray: teacher.classCodesArray
+                            classCodes: teacher.classCodes
                         });
                         document.getElementById('videoErrorMessage').innerText = 'Teacher details incomplete. Please contact support.';
                         return;
                     }
 
                     // Convert class codes array to comma-separated string
-                    const classCodes = teacher.classCodesArray.join(',');
+                    const classCodes = teacher.classCodes.join(',');
 
                     // Fetch videos filtered by teacher's school and class codes
                     fetch(`/videos?school_name=${encodeURIComponent(teacher.schoolName)}&class_code=${encodeURIComponent(classCodes)}`)
@@ -342,7 +342,7 @@ const capitalizedFirstName = firstName.charAt(0).toUpperCase() + firstName.slice
                                 if (video.metadata.school_name === teacher.schoolName) {
                                     const classCode = video.metadata.classCode;
                                     // Check if video's class code is in teacher's class codes
-                                    if (!teacher.classCodesArray.includes(classCode)) {
+                                    if (!teacher.classCodes.includes(classCode)) {
                                         return;
                                     }
                                     const studentEmail = video.metadata.userEmail;
