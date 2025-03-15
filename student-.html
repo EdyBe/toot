@@ -112,23 +112,33 @@ dropdownContent.addEventListener('mouseleave', function() {
                 if (iframe) {
                     if (!document.fullscreenElement) {
                         if (iframe.requestFullscreen) {
-                            iframe.requestFullscreen();
+                            iframe.requestFullscreen().then(() => {
+                                fullscreenButton.innerHTML = '<i class="fas fa-compress"></i>';
+                            });
                         } else if (iframe.mozRequestFullScreen) { // Firefox
                             iframe.mozRequestFullScreen();
+                            fullscreenButton.innerHTML = '<i class="fas fa-compress"></i>';
                         } else if (iframe.webkitRequestFullscreen) { // Chrome, Safari and Opera
                             iframe.webkitRequestFullscreen();
+                            fullscreenButton.innerHTML = '<i class="fas fa-compress"></i>';
                         } else if (iframe.msRequestFullscreen) { // IE/Edge
                             iframe.msRequestFullscreen();
+                            fullscreenButton.innerHTML = '<i class="fas fa-compress"></i>';
                         }
                     } else {
                         if (document.exitFullscreen) {
-                            document.exitFullscreen();
+                            document.exitFullscreen().then(() => {
+                                fullscreenButton.innerHTML = '<i class="fas fa-expand"></i>';
+                            });
                         } else if (document.mozCancelFullScreen) { // Firefox
                             document.mozCancelFullScreen();
+                            fullscreenButton.innerHTML = '<i class="fas fa-expand"></i>';
                         } else if (document.webkitExitFullscreen) { // Chrome, Safari and Opera
                             document.webkitExitFullscreen();
+                            fullscreenButton.innerHTML = '<i class="fas fa-expand"></i>';
                         } else if (document.msExitFullscreen) { // IE/Edge
                             document.msExitFullscreen();
+                            fullscreenButton.innerHTML = '<i class="fas fa-expand"></i>';
                         }
                     }
                 }
