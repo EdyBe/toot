@@ -344,7 +344,7 @@ p{
     bottom: 20px;
     right: 20px;
     z-index: 10000;
-    background: rgba(0, 0, 0, 0.8);
+    background: rgba(255, 255, 0, 0.8);
     transition: background 0.3s ease;
     display: block !important;
     opacity: 1 !important;
@@ -355,7 +355,6 @@ p{
     display: flex;
     align-items: center;
     justify-content: center;
-    color: yellow;
 }
 
 :fullscreen .fullscreen-button:hover {
