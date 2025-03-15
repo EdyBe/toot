@@ -724,7 +724,7 @@ app.post('/api/reset-password', async (req, res) => {
     }
 });
 
-// Endpoint to fetch videos for a user
+// Endpoint to fetch videos for a user (GET)
 app.get('/videos', async (req, res) => {
     try {
         const email = req.query.email;
@@ -758,6 +758,46 @@ app.get('/videos', async (req, res) => {
         }
 
         const { data: videos, error } = await query;
+
+        if (error) {
+            throw error;
+        }
+
+        // Format videos for frontend
+        const formattedVideos = videos.map(video => ({
+            _id: video.video_id,
+            metadata: {
+                title: video.title,
+                subject: video.subject,
+                classCode: video.class_code,
+                createdAt: video.created_at,
+                hlsUrl: video.hls_manifest_url,
+                dashUrl: video.dash_manifest_url
+            }
+        }));
+
+        res.json(formattedVideos);
+    } catch (error) {
+        console.error('Error fetching videos:', error);
+        res.status(500).json({ message: 'Failed to fetch videos' });
+    }
+});
+
+// Endpoint to fetch videos (POST)
+app.post('/api/videos', async (req, res) => {
+    try {
+        const { classCodes, schoolName } = req.body;
+        
+        if (!classCodes || !schoolName) {
+            return res.status(400).json({ message: 'classCodes and schoolName are required' });
+        }
+
+        // Query videos based on school name and class codes
+        const { data: videos, error } = await supabase
+            .from('videos')
+            .select('*')
+            .eq('school_name', schoolName)
+            .in('class_code', classCodes);
 
         if (error) {
             throw error;
