@@ -1,15 +1,17 @@
 // Function to fetch videos from server based on class codes and school name
-async function fetchVideos(classCodes, schoolName) {
+async function fetchVideos() {
     try {
+        const email = sessionStorage.getItem('userEmail');
+        if (!email) {
+            throw new Error('User not authenticated');
+        }
+        
         const response = await fetch('/api/videos', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({
-                classCodes,
-                schoolName
-            })
+            body: JSON.stringify({ email })
         });
         if (!response.ok) {
             throw new Error('Failed to fetch videos');
