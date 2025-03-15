@@ -349,3 +349,20 @@ p{
 :fullscreen .fullscreen-button i {
     transform: scale(1.2);
 }
+
+.minimize-button {
+    position: absolute;
+    bottom: 20px;
+    right: 60px;
+    background: rgba(0, 0, 0, 0.5);
+    border: none;
+    color: white;
+    padding: 8px;
+    border-radius: 4px;
+    cursor: pointer;
+    z-index: 1001;
+}
+
+.minimize-button:hover {
+    background: rgba(0, 0, 0, 0.7);
+}
