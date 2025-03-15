@@ -313,17 +313,20 @@ const capitalizedFirstName = firstName.charAt(0).toUpperCase() + firstName.slice
                     }
 
                     // Verify required fields exist
-                    if (!teacher.school_name || !teacher.class_code) {
+                    if (!teacher.schoolName || !teacher.classCodesArray || teacher.classCodesArray.length === 0) {
                         console.error('Missing required teacher details:', {
-                            school_name: teacher.school_name,
-                            class_code: teacher.class_code
+                            schoolName: teacher.schoolName,
+                            classCodesArray: teacher.classCodesArray
                         });
                         document.getElementById('videoErrorMessage').innerText = 'Teacher details incomplete. Please contact support.';
                         return;
                     }
 
-                    // Fetch videos filtered by teacher's school_name and class_code
-                    fetch(`/videos?school_name=${encodeURIComponent(teacher.school_name)}&class_code=${encodeURIComponent(teacher.class_code)}`)
+                    // Convert class codes array to comma-separated string
+                    const classCodes = teacher.classCodesArray.join(',');
+
+                    // Fetch videos filtered by teacher's school and class codes
+                    fetch(`/videos?school_name=${encodeURIComponent(teacher.schoolName)}&class_code=${encodeURIComponent(classCodes)}`)
                         .then(response => {
                             if (!response.ok) throw new Error('Network response was not ok');
                             return response.json();
@@ -336,8 +339,12 @@ const capitalizedFirstName = firstName.charAt(0).toUpperCase() + firstName.slice
                             const groupedVideos = {};
                             videos.forEach(video => {
                                 // Only include videos that match the teacher's school
-                                if (video.metadata.school_name === teacher.school_name) {
+                                if (video.metadata.school_name === teacher.schoolName) {
                                     const classCode = video.metadata.classCode;
+                                    // Check if video's class code is in teacher's class codes
+                                    if (!teacher.classCodesArray.includes(classCode)) {
+                                        return;
+                                    }
                                     const studentEmail = video.metadata.userEmail;
                                     
                                     if (!groupedVideos[classCode]) {
