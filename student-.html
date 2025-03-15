@@ -107,6 +107,13 @@ dropdownContent.addEventListener('mouseleave', function() {
             fullscreenButton.className = 'fullscreen-button';
             fullscreenButton.innerHTML = '<i class="fas fa-expand"></i>';
             
+            const updateFullscreenIcon = () => {
+                const isFullscreen = document.fullscreenElement === videoPlayer;
+                fullscreenButton.innerHTML = isFullscreen ? 
+                    '<i class="fas fa-compress"></i>' : 
+                    '<i class="fas fa-expand"></i>';
+            };
+
             const toggleFullscreen = () => {
                 const iframe = videoPlayerContainer.querySelector('iframe');
                 if (iframe) {
@@ -115,9 +122,7 @@ dropdownContent.addEventListener('mouseleave', function() {
                         if (iframe.requestFullscreen) {
                             iframe.requestFullscreen()
                                 .then(() => {
-                                    // Force update the button state immediately
-                                    fullscreenButton.innerHTML = '<i class="fas fa-compress"></i>';
-                                    fullscreenButton.dispatchEvent(new Event('fullscreenchange'));
+                                    updateFullscreenIcon();
                                     console.log('Entered fullscreen mode');
                                 })
                                 .catch(err => {
@@ -129,9 +134,7 @@ dropdownContent.addEventListener('mouseleave', function() {
                         if (document.exitFullscreen) {
                             document.exitFullscreen()
                                 .then(() => {
-                                    // Force update the button state immediately
-                                    fullscreenButton.innerHTML = '<i class="fas fa-expand"></i>';
-                                    fullscreenButton.dispatchEvent(new Event('fullscreenchange'));
+                                    updateFullscreenIcon();
                                     console.log('Exited fullscreen mode');
                                 })
                                 .catch(err => {
@@ -142,26 +145,18 @@ dropdownContent.addEventListener('mouseleave', function() {
                 }
             };
 
+            // Initialize icon state
+            updateFullscreenIcon();
+
             fullscreenButton.onclick = toggleFullscreen;
 
             const videoPlayer = document.createElement('iframe');
             
-            // Handle fullscreen change events for this specific video player
-            const updateFullscreenButton = () => {
-                if (document.fullscreenElement === videoPlayer) {
-                    fullscreenButton.classList.add('fullscreen-active');
-                    console.log('Fullscreen mode - showing compress icon');
-                } else {
-                    fullscreenButton.classList.remove('fullscreen-active');
-                    console.log('Normal mode - showing expand icon');
-                }
-            };
-
-            // Update button state immediately after fullscreen change
-            videoPlayer.addEventListener('fullscreenchange', updateFullscreenButton);
-            videoPlayer.addEventListener('webkitfullscreenchange', updateFullscreenButton);
-            videoPlayer.addEventListener('mozfullscreenchange', updateFullscreenButton);
-            videoPlayer.addEventListener('MSFullscreenChange', updateFullscreenButton);
+            // Update icon state on fullscreen changes
+            videoPlayer.addEventListener('fullscreenchange', updateFullscreenIcon);
+            videoPlayer.addEventListener('webkitfullscreenchange', updateFullscreenIcon);
+            videoPlayer.addEventListener('mozfullscreenchange', updateFullscreenIcon);
+            videoPlayer.addEventListener('MSFullscreenChange', updateFullscreenIcon);
             videoPlayer.src = `https://iframe.cloudflarestream.com/${video._id}`;
             videoPlayer.style.border = 'none';
             videoPlayer.style.position = 'absolute';
