@@ -786,18 +786,29 @@ app.get('/videos', async (req, res) => {
 // Endpoint to fetch videos (POST)
 app.post('/api/videos', async (req, res) => {
     try {
-        const { classCodes, schoolName } = req.body;
+        const { email } = req.body;
         
-        if (!classCodes || !schoolName) {
-            return res.status(400).json({ message: 'classCodes and schoolName are required' });
+        if (!email) {
+            return res.status(400).json({ message: 'Email is required' });
         }
 
-        // Query videos based on school name and class codes
+        // Get teacher's school name and class codes
+        const { data: user, error: userError } = await supabase
+            .from('users')
+            .select('schoolName, classCodesArray')
+            .eq('email', email)
+            .single();
+
+        if (userError || !user) {
+            throw userError || new Error('User not found');
+        }
+
+        // Query videos that match the teacher's school and class codes
         const { data: videos, error } = await supabase
             .from('videos')
             .select('*')
-            .eq('school_name', schoolName)
-            .in('class_code', classCodes);
+            .eq('school_name', user.schoolName)
+            .in('class_code', user.classCodesArray);
 
         if (error) {
             throw error;
