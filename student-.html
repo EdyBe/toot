@@ -93,91 +93,90 @@ dropdownContent.addEventListener('mouseenter', function() {
 dropdownContent.addEventListener('mouseleave', function() {
     dropdownContent.style.display = "none";
 });
+    function createVideoItem(video, folderContent) {
+        const videoItem = document.createElement('div');
+        videoItem.className = 'video-item';
 
-        function createVideoItem(video, folderContent) {
-            const videoItem = document.createElement('div');
-            videoItem.className = 'video-item';
+        const videoPlayerContainer = document.createElement('div');
+        videoPlayerContainer.style.position = 'relative';
+        videoPlayerContainer.style.paddingTop = '56.25%'; // 16:9 aspect ratio
 
-            const videoPlayerContainer = document.createElement('div');
-            videoPlayerContainer.style.position = 'relative';
-            videoPlayerContainer.style.paddingTop = '56.25%'; // 16:9 aspect ratio
-            
-            // Add fullscreen button
-            const fullscreenButton = document.createElement('button');
-            fullscreenButton.className = 'fullscreen-button';
-            fullscreenButton.innerHTML = '<i class="fas fa-expand"></i>';
+        // Add fullscreen button
+        const fullscreenButton = document.createElement('button');
+        fullscreenButton.className = 'fullscreen-button';
+        fullscreenButton.innerHTML = '<i class="fas fa-expand"></i>';
 
-            const videoPlayer = document.createElement('iframe');
-            
-            const toggleFullscreen = () => {
-                const iframe = videoPlayerContainer.querySelector('iframe');
-                if (iframe) {
-                    if (!document.fullscreenElement) {
-                        // Enter fullscreen
-                        if (iframe.requestFullscreen) {
-                            iframe.requestFullscreen()
-                                .then(() => {
-                                    fullscreenButton.innerHTML = '<i class="fas fa-compress"></i>';
-                                    console.log('Entered fullscreen mode');
-                                })
-                                .catch(err => {
-                                    console.error('Error entering fullscreen:', err);
-                                });
-                        }
-                    } else {
-                        // Exit fullscreen
-                        if (document.exitFullscreen) {
-                            document.exitFullscreen()
-                                .then(() => {
-                                    fullscreenButton.innerHTML = '<i class="fas fa-expand"></i>';
-                                    console.log('Exited fullscreen mode');
-                                })
-                                .catch(err => {
-                                    console.error('Error exiting fullscreen:', err);
-                                });
-                        }
+        const videoPlayer = document.createElement('iframe');
+
+        const toggleFullscreen = () => {
+            const iframe = videoPlayerContainer.querySelector('iframe');
+            if (iframe) {
+                if (!document.fullscreenElement) {
+                    // Enter fullscreen
+                    if (iframe.requestFullscreen) {
+                        iframe.requestFullscreen()
+                            .then(() => {
+                                fullscreenButton.innerHTML = '<i class="fas fa-compress"></i>';
+                                console.log('Entered fullscreen mode');
+                            })
+                            .catch(err => {
+                                console.error('Error entering fullscreen:', err);
+                            });
+                    }
+                } else {
+                    // Exit fullscreen
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen()
+                            .then(() => {
+                                fullscreenButton.innerHTML = '<i class="fas fa-expand"></i>';
+                                console.log('Exited fullscreen mode');
+                            })
+                            .catch(err => {
+                                console.error('Error exiting fullscreen:', err);
+                            });
                     }
                 }
-            };
+            }
+        };
 
-            fullscreenButton.onclick = toggleFullscreen;
-            
-            videoPlayer.src = `https://iframe.cloudflarestream.com/${video._id}`;
-            videoPlayer.style.border = 'none';
-            videoPlayer.style.position = 'absolute';
-            videoPlayer.style.top = '0';
-            videoPlayer.style.height = '100%';
-            videoPlayer.style.width = '100%';
-            videoPlayer.className = 'responsive-video';
-            videoPlayer.allow = 'autoplay; fullscreen;';
-            videoPlayer.allowFullscreen = true;
-            
-            videoPlayerContainer.appendChild(videoPlayer);
-            videoPlayerContainer.appendChild(fullscreenButton);
+        fullscreenButton.onclick = toggleFullscreen;
 
-            const title = document.createElement('h3');
-            title.className = 'video-title';
-            title.innerText = video.metadata.title;
+        videoPlayer.src = `https://iframe.cloudflarestream.com/${video._id}`;
+        videoPlayer.style.border = 'none';
+        videoPlayer.style.position = 'absolute';
+        videoPlayer.style.top = '0';
+        videoPlayer.style.height = '100%';
+        videoPlayer.style.width = '100%';
+        videoPlayer.className = 'responsive-video';
+        videoPlayer.allow = 'autoplay; fullscreen;';
+        videoPlayer.allowFullscreen = true;
 
-            const subject = document.createElement('p');
-            subject.className = 'video-subject';
-            subject.innerText = video.metadata.subject;
+        videoPlayerContainer.appendChild(videoPlayer);
+        videoPlayerContainer.appendChild(fullscreenButton);
 
-            const date = document.createElement('p');
-            date.className = 'video-date';
-            date.innerText = new Date(video.metadata.createdAt).toLocaleDateString();
+        const title = document.createElement('h3');
+        title.className = 'video-title';
+        title.innerText = video.metadata.title;
 
-            const deleteButton = document.createElement('button');
-            deleteButton.className = 'delete-button';
-            deleteButton.innerText = 'Delete';
-            deleteButton.onclick = () => deleteVideo(videoId);
+        const subject = document.createElement('p');
+        subject.className = 'video-subject';
+        subject.innerText = video.metadata.subject;
 
-            videoItem.appendChild(videoPlayerContainer);
-            videoItem.appendChild(title);
-            videoItem.appendChild(subject);
-            videoItem.appendChild(deleteButton);
+        const date = document.createElement('p');
+        date.className = 'video-date';
+        date.innerText = new Date(video.metadata.createdAt).toLocaleDateString();
 
-            folderContent.appendChild(videoItem);
+        const deleteButton = document.createElement('button');
+        deleteButton.className = 'delete-button';
+        deleteButton.innerText = 'Delete';
+        deleteButton.onclick = () => deleteVideo(video._id);
+
+        videoItem.appendChild(videoPlayerContainer);
+        videoItem.appendChild(title);
+        videoItem.appendChild(subject);
+        videoItem.appendChild(deleteButton);
+
+        folderContent.appendChild(videoItem);
         }
 
         function filterAndDisplayVideos(videos, folderContent, searchTerm = '') {
