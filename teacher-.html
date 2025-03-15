@@ -254,8 +254,8 @@ dropdownContent.addEventListener('mouseleave', function() {
             Object.keys(students).forEach(studentEmail => {
                 const studentFolder = document.createElement('div');
                 studentFolder.className = 'folder student-folder';
-const firstName = studentEmail.split('@')[0].split('.')[0];
-const capitalizedFirstName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
+                const firstName = studentEmail.split('@')[0].split('.')[0];
+                const capitalizedFirstName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
                 studentFolder.innerHTML = `
                     <div><i class="fas fa-folder"></i> ${capitalizedFirstName}</div>
                     <i class="fas fa-chevron-down arrow-icon"></i>
@@ -322,7 +322,7 @@ const capitalizedFirstName = firstName.charAt(0).toUpperCase() + firstName.slice
                 }
 
                 // Fetch videos using teacher's class codes and school name
-                const videos = await fetchVideos(teacher.classCodes, teacher.schoolName);
+                const videos = await TfetchVideos(teacher.classCodesArray, teacher.schoolName);
                 const videoCard = document.getElementById('videoCard');
                 videos.reverse();
 
