@@ -102,10 +102,15 @@ dropdownContent.addEventListener('mouseleave', function() {
             videoPlayerContainer.style.position = 'relative';
             videoPlayerContainer.style.paddingTop = '56.25%'; // 16:9 aspect ratio
             
-            // Add fullscreen button
+            // Add fullscreen and minimize buttons
             const fullscreenButton = document.createElement('button');
             fullscreenButton.className = 'fullscreen-button';
             fullscreenButton.innerHTML = '<i class="fas fa-expand"></i>';
+
+            const minimizeButton = document.createElement('button');
+            minimizeButton.className = 'minimize-button';
+            minimizeButton.innerHTML = '<i class="fas fa-compress"></i>';
+            minimizeButton.style.display = 'none'; // Hidden by default
 
             const videoPlayer = document.createElement('iframe');
             
@@ -125,6 +130,7 @@ dropdownContent.addEventListener('mouseleave', function() {
                             iframe.requestFullscreen()
                                 .then(() => {
                                     updateFullscreenIcon();
+                                    minimizeButton.style.display = 'block';
                                     console.log('Entered fullscreen mode');
                                 })
                                 .catch(err => {
@@ -137,6 +143,7 @@ dropdownContent.addEventListener('mouseleave', function() {
                             document.exitFullscreen()
                                 .then(() => {
                                     updateFullscreenIcon();
+                                    minimizeButton.style.display = 'none';
                                     console.log('Exited fullscreen mode');
                                 })
                                 .catch(err => {
@@ -146,6 +153,20 @@ dropdownContent.addEventListener('mouseleave', function() {
                     }
                 }
             };
+
+            const minimizeVideo = () => {
+                const iframe = videoPlayerContainer.querySelector('iframe');
+                if (iframe && document.fullscreenElement) {
+                    iframe.style.width = '50%';
+                    iframe.style.height = '50%';
+                    iframe.style.position = 'fixed';
+                    iframe.style.bottom = '20px';
+                    iframe.style.right = '20px';
+                    iframe.style.zIndex = '1000';
+                }
+            };
+
+            minimizeButton.onclick = minimizeVideo;
 
             // Initialize icon state
             updateFullscreenIcon();
@@ -168,6 +189,7 @@ dropdownContent.addEventListener('mouseleave', function() {
             
             videoPlayerContainer.appendChild(videoPlayer);
             videoPlayerContainer.appendChild(fullscreenButton);
+            videoPlayerContainer.appendChild(minimizeButton);
 
             const title = document.createElement('h3');
             title.className = 'video-title';
