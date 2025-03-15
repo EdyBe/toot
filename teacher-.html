@@ -325,10 +325,17 @@ const capitalizedFirstName = firstName.charAt(0).toUpperCase() + firstName.slice
                     // Convert class codes array to comma-separated string
                     const classCodes = teacher.classCodes.join(',');
 
+                    // Construct the API endpoint with proper encoding
+                    const apiUrl = `/videos?school_name=${encodeURIComponent(teacher.schoolName)}&class_code=${encodeURIComponent(classCodes)}`;
+                    console.log('Fetching videos from:', apiUrl);
+                    
                     // Fetch videos filtered by teacher's school and class codes
-                    fetch(`/videos?school_name=${encodeURIComponent(teacher.schoolName)}&class_code=${encodeURIComponent(classCodes)}`)
+                    fetch(apiUrl)
                         .then(response => {
-                            if (!response.ok) throw new Error('Network response was not ok');
+                            if (!response.ok) {
+                                console.error('API Response:', response);
+                                throw new Error(`Network response was not ok. Status: ${response.status}`);
+                            }
                             return response.json();
                         })
                         .then(videos => {
