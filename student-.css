@@ -328,4 +328,7 @@ p{
     bottom: 20px;
     right: 20px;
     z-index: 10000;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
 }
