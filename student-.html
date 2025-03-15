@@ -142,11 +142,6 @@ dropdownContent.addEventListener('mouseleave', function() {
 
             fullscreenButton.onclick = toggleFullscreen;
             
-            // Update icon state on fullscreen changes
-            videoPlayer.addEventListener('fullscreenchange', updateFullscreenIcon);
-            videoPlayer.addEventListener('webkitfullscreenchange', updateFullscreenIcon);
-            videoPlayer.addEventListener('mozfullscreenchange', updateFullscreenIcon);
-            videoPlayer.addEventListener('MSFullscreenChange', updateFullscreenIcon);
             videoPlayer.src = `https://iframe.cloudflarestream.com/${video._id}`;
             videoPlayer.style.border = 'none';
             videoPlayer.style.position = 'absolute';
