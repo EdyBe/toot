@@ -297,36 +297,34 @@ const capitalizedFirstName = firstName.charAt(0).toUpperCase() + firstName.slice
                 return;
             }
 
-            // Fetch teacher's details to get school_name, class_code, and first name
-            fetch(`/user-info?email=${encodeURIComponent(email)}`)
-                .then(response => {
-                    if (!response.ok) throw new Error('Network response was not ok');
-                    return response.json();
-                })
-                .then(teacher => {
-                    console.log('Teacher details:', teacher);
-                    
-                    // Update welcome message
-                    if (teacher.firstName) {
-                        document.getElementById('firstNameInitial').innerText = teacher.firstName.charAt(0).toUpperCase();
-                        document.getElementById('firstName').innerText = `Welcome ${teacher.firstName}`;
-                    }
+            try {
+                // Fetch teacher's details
+                const teacherResponse = await fetch(`/user-info?email=${encodeURIComponent(email)}`);
+                if (!teacherResponse.ok) throw new Error('Network response was not ok');
+                const teacher = await teacherResponse.json();
+                
+                console.log('Teacher details:', teacher);
+                
+                // Update welcome message
+                if (teacher.firstName) {
+                    document.getElementById('firstNameInitial').innerText = teacher.firstName.charAt(0).toUpperCase();
+                    document.getElementById('firstName').innerText = `Welcome ${teacher.firstName}`;
+                }
 
-                    // Verify required fields exist
-                    if (!teacher.schoolName || !teacher.classCodes || teacher.classCodes.length === 0) {
-                        console.error('Missing required teacher details:', {
-                            schoolName: teacher.schoolName,
-                            classCodes: teacher.classCodes
-                        });
-                        document.getElementById('videoErrorMessage').innerText = 'Teacher details incomplete. Please contact support.';
-                        return;
-                    }
+                // Verify required fields exist
+                if (!teacher.schoolName || !teacher.classCodes || teacher.classCodes.length === 0) {
+                    console.error('Missing required teacher details:', {
+                        schoolName: teacher.schoolName,
+                        classCodes: teacher.classCodes
+                    });
+                    document.getElementById('videoErrorMessage').innerText = 'Teacher details incomplete. Please contact support.';
+                    return;
+                }
 
-
-                    try {
-
-                        const videoCard = document.getElementById('videoCard');
-                        videos.reverse();
+                // Fetch videos using teacher's class codes and school name
+                const videos = await fetchVideos(teacher.classCodes, teacher.schoolName);
+                const videoCard = document.getElementById('videoCard');
+                videos.reverse();
 
                         // Group videos by class code and student, ensuring they match teacher's school
                         const groupedVideos = {};
@@ -372,7 +370,7 @@ const capitalizedFirstName = firstName.charAt(0).toUpperCase() + firstName.slice
                         document.getElementById('videoErrorMessage').innerText = 'Failed to load videos.';
                     }
                 });
-        });
+        ;
     </script>
     <script src="script.js"></script>
 </body>
