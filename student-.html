@@ -107,6 +107,11 @@ dropdownContent.addEventListener('mouseleave', function() {
         fullscreenButton.className = 'fullscreen-button';
         fullscreenButton.innerHTML = '<i class="fas fa-expand"></i>';
 
+        const minimizeButton = document.createElement('button');
+        minimizeButton.className = 'minimize-button';
+        minimizeButton.innerHTML = '<i class="fas fa-compress"></i>';
+        minimizeButton.style.display = 'none';
+
         const videoPlayer = document.createElement('iframe');
 
         const toggleFullscreen = () => {
@@ -154,6 +159,7 @@ dropdownContent.addEventListener('mouseleave', function() {
 
         videoPlayerContainer.appendChild(videoPlayer);
         videoPlayerContainer.appendChild(fullscreenButton);
+        videoPlayerContainer.appendChild(minimizeButton);
 
         const title = document.createElement('h3');
         title.className = 'video-title';
@@ -182,12 +188,17 @@ dropdownContent.addEventListener('mouseleave', function() {
 
     document.addEventListener('fullscreenchange', () => {
         const fullscreenButton = document.querySelector('.fullscreen-button');
+        const minimizeButton = document.querySelector('.minimize-button');
         if (document.fullscreenElement) {
             fullscreenButton.innerHTML = '<i class="fas fa-compress"></i>';
+            minimizeButton.style.display = 'block';
         } else {
             fullscreenButton.innerHTML = '<i class="fas fa-expand"></i>';
+            minimizeButton.style.display = 'none';
         }
     });
+
+    minimizeButton.onclick = toggleFullscreen;
 
 
         }
