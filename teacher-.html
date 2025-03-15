@@ -290,7 +290,7 @@ const capitalizedFirstName = firstName.charAt(0).toUpperCase() + firstName.slice
             videoCard.appendChild(classFolderContent);
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             const email = sessionStorage.getItem('userEmail');
             if (!email) {
                 document.getElementById('videoErrorMessage').innerText = 'User not authenticated';
@@ -322,70 +322,55 @@ const capitalizedFirstName = firstName.charAt(0).toUpperCase() + firstName.slice
                         return;
                     }
 
-                    // Convert class codes array to comma-separated string
-                    const classCodes = teacher.classCodes.join(',');
 
-                    // Construct the API endpoint with proper encoding
-                    const apiUrl = `/videos?school_name=${encodeURIComponent(teacher.schoolName)}&class_code=${encodeURIComponent(classCodes)}`;
-                    console.log('Fetching videos from:', apiUrl);
-                    
-                    // Fetch videos filtered by teacher's school and class codes
-                    fetch(apiUrl)
-                        .then(response => {
-                            if (!response.ok) {
-                                console.error('API Response:', response);
-                                throw new Error(`Network response was not ok. Status: ${response.status}`);
+                    try {
+
+                        const videoCard = document.getElementById('videoCard');
+                        videos.reverse();
+
+                        // Group videos by class code and student, ensuring they match teacher's school
+                        const groupedVideos = {};
+                        videos.forEach(video => {
+                            // Only include videos that match the teacher's school
+                            if (video.school_name === teacher.schoolName) {
+                                const classCode = video.class_code;
+                                // Check if video's class code is in teacher's class codes
+                                if (!teacher.classCodes.includes(classCode)) {
+                                    return;
+                                }
+                                const studentEmail = video.user_email;
+                                
+                                if (!groupedVideos[classCode]) {
+                                    groupedVideos[classCode] = {};
+                                }
+                                if (!groupedVideos[classCode][studentEmail]) {
+                                    groupedVideos[classCode][studentEmail] = [];
+                                }
+                                groupedVideos[classCode][studentEmail].push(video);
                             }
-                            return response.json();
-                        })
-                        .then(videos => {
-                            const videoCard = document.getElementById('videoCard');
-                            videos.reverse();
-
-                            // Group videos by class code and student, ensuring they match teacher's school
-                            const groupedVideos = {};
-                            videos.forEach(video => {
-                                // Only include videos that match the teacher's school
-                                if (video.metadata.school_name === teacher.schoolName) {
-                                    const classCode = video.metadata.classCode;
-                                    // Check if video's class code is in teacher's class codes
-                                    if (!teacher.classCodes.includes(classCode)) {
-                                        return;
-                                    }
-                                    const studentEmail = video.metadata.userEmail;
-                                    
-                                    if (!groupedVideos[classCode]) {
-                                        groupedVideos[classCode] = {};
-                                    }
-                                    if (!groupedVideos[classCode][studentEmail]) {
-                                        groupedVideos[classCode][studentEmail] = [];
-                                    }
-                                    groupedVideos[classCode][studentEmail].push(video);
-                                }
-                            });
-
-                            // Create folders for each class code
-                            Object.keys(groupedVideos).forEach(classCode => {
-                                createClassCodeFolder(classCode, groupedVideos[classCode]);
-                            });
-
-                            // Search functionality
-                            const searchInput = document.getElementById('searchInput');
-                            searchInput.addEventListener('input', () => {
-                                const searchTerm = searchInput.value;
-                                // Only filter videos if a student folder is open
-                                if (currentStudentVideos) {
-                                    const openStudentContent = document.querySelector('.student-folder.active + .folder-content');
-                                    if (openStudentContent) {
-                                        filterAndDisplayVideos(currentStudentVideos, openStudentContent, searchTerm);
-                                    }
-                                }
-                            });
-                        })
-                        .catch(error => {
-                            console.error('Error fetching videos:', error);
-                            document.getElementById('videoErrorMessage').innerText = 'Failed to load videos.';
                         });
+
+                        // Create folders for each class code
+                        Object.keys(groupedVideos).forEach(classCode => {
+                            createClassCodeFolder(classCode, groupedVideos[classCode]);
+                        });
+
+                        // Search functionality
+                        const searchInput = document.getElementById('searchInput');
+                        searchInput.addEventListener('input', () => {
+                            const searchTerm = searchInput.value;
+                            // Only filter videos if a student folder is open
+                            if (currentStudentVideos) {
+                                const openStudentContent = document.querySelector('.student-folder.active + .folder-content');
+                                if (openStudentContent) {
+                                    filterAndDisplayVideos(currentStudentVideos, openStudentContent, searchTerm);
+                                }
+                            }
+                        });
+                    } catch (error) {
+                        console.error('Error fetching videos:', error);
+                        document.getElementById('videoErrorMessage').innerText = 'Failed to load videos.';
+                    }
                 });
         });
     </script>
