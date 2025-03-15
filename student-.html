@@ -115,7 +115,9 @@ dropdownContent.addEventListener('mouseleave', function() {
                         if (iframe.requestFullscreen) {
                             iframe.requestFullscreen()
                                 .then(() => {
+                                    // Force update the button state immediately
                                     fullscreenButton.innerHTML = '<i class="fas fa-compress"></i>';
+                                    fullscreenButton.dispatchEvent(new Event('fullscreenchange'));
                                     console.log('Entered fullscreen mode');
                                 })
                                 .catch(err => {
@@ -127,7 +129,9 @@ dropdownContent.addEventListener('mouseleave', function() {
                         if (document.exitFullscreen) {
                             document.exitFullscreen()
                                 .then(() => {
+                                    // Force update the button state immediately
                                     fullscreenButton.innerHTML = '<i class="fas fa-expand"></i>';
+                                    fullscreenButton.dispatchEvent(new Event('fullscreenchange'));
                                     console.log('Exited fullscreen mode');
                                 })
                                 .catch(err => {
