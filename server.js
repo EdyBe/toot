@@ -516,21 +516,6 @@ app.get('/class-codes', async (req, res) => {
     }
 });
 
-
-
-
-
-
-
-/////
-
-
-
-
-
-
-
-
 // TUS Server Configuration
 const tusServer = new Server({
     path: '/files', // TUS endpoint
@@ -546,32 +531,7 @@ const tusServer = new Server({
 // Middleware to handle TUS uploads
 app.use('/files', tusServer.handle.bind(tusServer));
 
-// Existing user info retrieval endpoint
-app.get('/user-info', async (req, res) => {
-    try {
-        const email = req.query.email;
-        if (!email) {
-            return res.status(400).json({ message: 'Email is required' });
-        }
 
-        const { user, videos } = await readUser(email);
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-
-        // Capitalize first name for display
-        const capitalizedFirstName = user.firstName.charAt(0).toUpperCase() + user.firstName.slice(1);
-        
-        res.json({
-            firstName: capitalizedFirstName,
-            classCodes: user.classCodesArray,
-            schoolName: user.schoolName
-        });
-    } catch (error) {
-        console.error('Error fetching user info:', error);
-        res.status(500).json({ message: 'Failed to fetch user info' });
-    }
-});
 
 /**
  * Retrieves user information including first name, class codes, and school name
@@ -783,56 +743,7 @@ app.get('/videos', async (req, res) => {
     }
 });
 
-// Endpoint to fetch videos (POST)
-app.post('/api/videos', async (req, res) => {
-    try {
-        const { email } = req.body;
-        
-        if (!email) {
-            return res.status(400).json({ message: 'Email is required' });
-        }
 
-        // Get teacher's school name and class codes
-        const { data: user, error: userError } = await supabase
-            .from('users')
-            .select('schoolName, classCodesArray')
-            .eq('email', email)
-            .single();
-
-        if (userError || !user) {
-            throw userError || new Error('User not found');
-        }
-
-        // Query videos that match the teacher's school and class codes
-        const { data: videos, error } = await supabase
-            .from('videos')
-            .select('*')
-            .eq('school_name', user.schoolName)
-            .in('class_code', user.classCodesArray);
-
-        if (error) {
-            throw error;
-        }
-
-        // Format videos for frontend
-        const formattedVideos = videos.map(video => ({
-            _id: video.video_id,
-            metadata: {
-                title: video.title,
-                subject: video.subject,
-                classCode: video.class_code,
-                createdAt: video.created_at,
-                hlsUrl: video.hls_manifest_url,
-                dashUrl: video.dash_manifest_url
-            }
-        }));
-
-        res.json(formattedVideos);
-    } catch (error) {
-        console.error('Error fetching videos:', error);
-        res.status(500).json({ message: 'Failed to fetch videos' });
-    }
-});
 
 // Video Viewing Functionality
 app.post('/videos/view', async (req, res) => {
