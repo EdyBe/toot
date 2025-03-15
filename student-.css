@@ -330,39 +330,3 @@ p{
 
 
 
-/* Animation for icon change */
-.fullscreen-button i {
-    transition: transform 0.3s ease;
-}
-
-:fullscreen .fullscreen-button i {
-    transform: scale(1.2);
-}
-
-:fullscreen .fullscreen-button {
-    position: fixed;
-    bottom: 20px;
-    right: 20px;
-    z-index: 10000;
-    background: rgba(0, 0, 0, 0.8);
-    transition: background 0.3s ease;
-    display: block !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-:fullscreen .fullscreen-button:hover {
-    background: rgba(255, 255, 0, 0.9);
-}
-
-:fullscreen .fullscreen-button i {
-    transform: scale(1.2);
-    color: #fff;
-    transition: transform 0.3s ease;
-}
