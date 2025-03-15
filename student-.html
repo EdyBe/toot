@@ -102,25 +102,13 @@ dropdownContent.addEventListener('mouseleave', function() {
             videoPlayerContainer.style.position = 'relative';
             videoPlayerContainer.style.paddingTop = '56.25%'; // 16:9 aspect ratio
             
-            // Add fullscreen and minimize buttons
+            // Add fullscreen button
             const fullscreenButton = document.createElement('button');
             fullscreenButton.className = 'fullscreen-button';
             fullscreenButton.innerHTML = '<i class="fas fa-expand"></i>';
 
-            const minimizeButton = document.createElement('button');
-            minimizeButton.className = 'minimize-button';
-            minimizeButton.innerHTML = '<i class="fas fa-compress"></i>';
-            minimizeButton.style.display = 'none'; // Hidden by default
-
             const videoPlayer = document.createElement('iframe');
             
-            const updateFullscreenIcon = () => {
-                const isFullscreen = document.fullscreenElement === videoPlayer;
-                fullscreenButton.innerHTML = isFullscreen ? 
-                    '<i class="fas fa-compress"></i>' : 
-                    '<i class="fas fa-expand"></i>';
-            };
-
             const toggleFullscreen = () => {
                 const iframe = videoPlayerContainer.querySelector('iframe');
                 if (iframe) {
@@ -129,8 +117,7 @@ dropdownContent.addEventListener('mouseleave', function() {
                         if (iframe.requestFullscreen) {
                             iframe.requestFullscreen()
                                 .then(() => {
-                                    updateFullscreenIcon();
-                                    minimizeButton.style.display = 'block';
+                                    fullscreenButton.innerHTML = '<i class="fas fa-compress"></i>';
                                     console.log('Entered fullscreen mode');
                                 })
                                 .catch(err => {
@@ -142,8 +129,7 @@ dropdownContent.addEventListener('mouseleave', function() {
                         if (document.exitFullscreen) {
                             document.exitFullscreen()
                                 .then(() => {
-                                    updateFullscreenIcon();
-                                    minimizeButton.style.display = 'none';
+                                    fullscreenButton.innerHTML = '<i class="fas fa-expand"></i>';
                                     console.log('Exited fullscreen mode');
                                 })
                                 .catch(err => {
@@ -154,22 +140,6 @@ dropdownContent.addEventListener('mouseleave', function() {
                 }
             };
 
-            const minimizeVideo = () => {
-                const iframe = videoPlayerContainer.querySelector('iframe');
-                if (iframe && document.fullscreenElement) {
-                    iframe.style.width = '50%';
-                    iframe.style.height = '50%';
-                    iframe.style.position = 'fixed';
-                    iframe.style.bottom = '20px';
-                    iframe.style.right = '20px';
-                    iframe.style.zIndex = '1000';
-                }
-            };
-
-            minimizeButton.onclick = minimizeVideo;
-
-            // Initialize icon state
-            updateFullscreenIcon();
             fullscreenButton.onclick = toggleFullscreen;
             
             // Update icon state on fullscreen changes
@@ -189,7 +159,6 @@ dropdownContent.addEventListener('mouseleave', function() {
             
             videoPlayerContainer.appendChild(videoPlayer);
             videoPlayerContainer.appendChild(fullscreenButton);
-            videoPlayerContainer.appendChild(minimizeButton);
 
             const title = document.createElement('h3');
             title.className = 'video-title';
