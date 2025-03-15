@@ -149,10 +149,10 @@ dropdownContent.addEventListener('mouseleave', function() {
             // Handle fullscreen change events for this specific video player
             const updateFullscreenButton = () => {
                 if (document.fullscreenElement === videoPlayer) {
-                    fullscreenButton.innerHTML = '<i class="fas fa-compress"></i>';
+                    fullscreenButton.classList.add('fullscreen-active');
                     console.log('Fullscreen mode - showing compress icon');
                 } else {
-                    fullscreenButton.innerHTML = '<i class="fas fa-expand"></i>';
+                    fullscreenButton.classList.remove('fullscreen-active');
                     console.log('Normal mode - showing expand icon');
                 }
             };
