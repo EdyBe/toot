@@ -96,11 +96,88 @@ dropdownContent.addEventListener('mouseleave', function() {
             const videoItem = document.createElement('div');
             videoItem.className = 'video-item';
 
-            const videoPlayer = document.createElement('video');
-            videoPlayer.controls = true;
-            const videoId = video._id;
-            videoPlayer.src = `/videos.files/${videoId}`;
-            videoPlayer.type = video.metadata.contentType;
+            const videoPlayerContainer = document.createElement('div');
+            videoPlayerContainer.style.position = 'relative';
+            videoPlayerContainer.style.paddingTop = '56.25%'; // 16:9 aspect ratio
+
+            // Add fullscreen button
+            const fullscreenButton = document.createElement('button');
+            fullscreenButton.className = 'fullscreen-button';
+            fullscreenButton.innerHTML = '<i class="fas fa-expand"></i>';
+
+            // Add minimize button
+            const minimizeButton = document.createElement('button');
+            minimizeButton.className = 'minimize-button';
+            minimizeButton.innerHTML = '<i class="fas fa-compress"></i>';
+            minimizeButton.style.display = 'none';
+
+            const videoPlayer = document.createElement('iframe');
+            videoPlayer.src = `https://iframe.cloudflarestream.com/${video._id}`;
+            videoPlayer.style.border = 'none';
+            videoPlayer.style.position = 'absolute';
+            videoPlayer.style.top = '0';
+            videoPlayer.style.height = '100%';
+            videoPlayer.style.width = '100%';
+            videoPlayer.className = 'responsive-video';
+            videoPlayer.allow = 'autoplay; fullscreen;';
+            videoPlayer.allowFullscreen = true;
+
+            const toggleFullscreen = () => {
+                const iframe = videoPlayerContainer.querySelector('iframe');
+                if (iframe) {
+                    if (!document.fullscreenElement) {
+                        // Enter fullscreen
+                        if (iframe.requestFullscreen) {
+                            iframe.requestFullscreen()
+                                .then(() => {
+                                    fullscreenButton.innerHTML = '<i class="fas fa-compress"></i>';
+                                })
+                                .catch(err => {
+                                    console.error('Error entering fullscreen:', err);
+                                });
+                        }
+                    } else {
+                        // Exit fullscreen
+                        if (document.exitFullscreen) {
+                            document.exitFullscreen()
+                                .then(() => {
+                                    fullscreenButton.innerHTML = '<i class="fas fa-expand"></i>';
+                                })
+                                .catch(err => {
+                                    console.error('Error exiting fullscreen:', err);
+                                });
+                        }
+                    }
+                }
+            };
+
+            fullscreenButton.onclick = toggleFullscreen;
+            minimizeButton.onclick = toggleFullscreen;
+
+            videoPlayerContainer.appendChild(videoPlayer);
+            videoPlayerContainer.appendChild(fullscreenButton);
+            videoPlayerContainer.appendChild(minimizeButton);
+
+            // Update icon when fullscreen state changes
+            document.addEventListener('fullscreenchange', () => {
+                const fullscreenButton = videoPlayerContainer.querySelector('.fullscreen-button');
+                const minimizeButton = videoPlayerContainer.querySelector('.minimize-button');
+                
+                if (document.fullscreenElement) {
+                    fullscreenButton.style.display = 'none';
+                    minimizeButton.style.display = 'flex';
+                } else {
+                    fullscreenButton.style.display = 'flex';
+                    minimizeButton.style.display = 'none';
+                }
+            });
+
+            // Handle ESC key press to exit fullscreen
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && document.fullscreenElement) {
+                    document.exitFullscreen();
+                }
+            });
 
             const subject = document.createElement('h3');
             subject.className = 'video-title';
@@ -117,19 +194,18 @@ dropdownContent.addEventListener('mouseleave', function() {
                 videoItem.appendChild(blueIcon);
             }
 
-            videoItem.appendChild(videoPlayer);
+            videoItem.appendChild(videoPlayerContainer);
             videoItem.appendChild(subject);
             videoItem.appendChild(emailDisplay);
 
             const downloadLink = document.createElement('a');
-            downloadLink.href = `/videos.files/${videoId}`;
-            downloadLink.download = videoId;
+            downloadLink.href = `/videos.files/${video._id}`;
+            downloadLink.download = video._id;
             downloadLink.innerHTML = '<i class="fas fa-download"></i>';
             downloadLink.className = 'download-icon';
             videoItem.appendChild(downloadLink);
 
             studentFolderContent.appendChild(videoItem);
-            videoPlayer.load();
 
             videoPlayer.addEventListener('play', () => {
                 if (blueIcon.parentNode) {
@@ -141,7 +217,7 @@ dropdownContent.addEventListener('mouseleave', function() {
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ id: videoId })
+                    body: JSON.stringify({ id: video._id })
                 })
                 .catch(error => {
                     console.error('Error marking video as viewed:', error);
@@ -221,69 +297,69 @@ const capitalizedFirstName = firstName.charAt(0).toUpperCase() + firstName.slice
                 return;
             }
 
-            // Fetch user details
+            // Fetch teacher's details to get school_name, class_code, and first name
             fetch(`/user-info?email=${encodeURIComponent(email)}`)
                 .then(response => {
                     if (!response.ok) throw new Error('Network response was not ok');
                     return response.json();
                 })
-                .then(user => {
-                    if (user.firstName) {
-                        document.getElementById('firstNameInitial').innerText = user.firstName.charAt(0).toUpperCase();
-                        document.getElementById('firstName').innerText = `Welcome ${user.firstName}`;
+                .then(teacher => {
+                    // Update welcome message
+                    if (teacher.firstName) {
+                        document.getElementById('firstNameInitial').innerText = teacher.firstName.charAt(0).toUpperCase();
+                        document.getElementById('firstName').innerText = `Welcome ${teacher.firstName}`;
                     }
-                })
-                .catch(error => {
-                    console.error('Error fetching user details:', error);
-                    document.getElementById('videoErrorMessage').innerText = 'Failed to load user details.';
-                });
 
-            // Fetch videos
-            fetch(`/videos?email=${encodeURIComponent(email)}`)
-                .then(response => {
-                    if (!response.ok) throw new Error('Network response was not ok');
-                    return response.json();
-                })
-                .then(videos => {
-                    const videoCard = document.getElementById('videoCard');
-                    videos.reverse();
+                    // Fetch videos filtered by teacher's school_name and class_code
+                    fetch(`/videos?school_name=${encodeURIComponent(teacher.school_name)}&class_code=${encodeURIComponent(teacher.class_code)}`)
+                        .then(response => {
+                            if (!response.ok) throw new Error('Network response was not ok');
+                            return response.json();
+                        })
+                        .then(videos => {
+                            const videoCard = document.getElementById('videoCard');
+                            videos.reverse();
 
-                    // Group videos by class code and student
-                    const groupedVideos = {};
-                    videos.forEach(video => {
-                        const classCode = video.metadata.classCode;
-                        const studentEmail = video.metadata.userEmail;
-                        
-                        if (!groupedVideos[classCode]) {
-                            groupedVideos[classCode] = {};
-                        }
-                        if (!groupedVideos[classCode][studentEmail]) {
-                            groupedVideos[classCode][studentEmail] = [];
-                        }
-                        groupedVideos[classCode][studentEmail].push(video);
-                    });
+                            // Group videos by class code and student, ensuring they match teacher's school
+                            const groupedVideos = {};
+                            videos.forEach(video => {
+                                // Only include videos that match the teacher's school
+                                if (video.metadata.school_name === teacher.school_name) {
+                                    const classCode = video.metadata.classCode;
+                                    const studentEmail = video.metadata.userEmail;
+                                    
+                                    if (!groupedVideos[classCode]) {
+                                        groupedVideos[classCode] = {};
+                                    }
+                                    if (!groupedVideos[classCode][studentEmail]) {
+                                        groupedVideos[classCode][studentEmail] = [];
+                                    }
+                                    groupedVideos[classCode][studentEmail].push(video);
+                                }
+                            });
 
-                    // Create folders for each class code
-                    Object.keys(groupedVideos).forEach(classCode => {
-                        createClassCodeFolder(classCode, groupedVideos[classCode]);
-                    });
+                            // Create folders for each class code
+                            Object.keys(groupedVideos).forEach(classCode => {
+                                createClassCodeFolder(classCode, groupedVideos[classCode]);
+                            });
 
-                    // Search functionality
-                    const searchInput = document.getElementById('searchInput');
-                    searchInput.addEventListener('input', () => {
-                        const searchTerm = searchInput.value;
-                        // Only filter videos if a student folder is open
-                        if (currentStudentVideos) {
-                            const openStudentContent = document.querySelector('.student-folder.active + .folder-content');
-                            if (openStudentContent) {
-                                filterAndDisplayVideos(currentStudentVideos, openStudentContent, searchTerm);
-                            }
-                        }
-                    });
-                })
-                .catch(error => {
-                    console.error('Error fetching videos:', error);
-                    document.getElementById('videoErrorMessage').innerText = 'Failed to load videos.';
+                            // Search functionality
+                            const searchInput = document.getElementById('searchInput');
+                            searchInput.addEventListener('input', () => {
+                                const searchTerm = searchInput.value;
+                                // Only filter videos if a student folder is open
+                                if (currentStudentVideos) {
+                                    const openStudentContent = document.querySelector('.student-folder.active + .folder-content');
+                                    if (openStudentContent) {
+                                        filterAndDisplayVideos(currentStudentVideos, openStudentContent, searchTerm);
+                                    }
+                                }
+                            });
+                        })
+                        .catch(error => {
+                            console.error('Error fetching videos:', error);
+                            document.getElementById('videoErrorMessage').innerText = 'Failed to load videos.';
+                        });
                 });
         });
     </script>
