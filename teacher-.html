@@ -280,7 +280,7 @@ dropdownContent.addEventListener('mouseleave', function() {
                     console.log('First video object:', videos[0]); // Debug log
                     videos.forEach(video => {
                         const classCode = video.metadata?.classCode || 'Unknown Class';
-                        const firstName = video.metadata?.userEmail || 'Unknown Student';
+                        const firstName = video.metadata?.firstName || 'Unknown Student';
                         console.log('Processing video:', {classCode, firstName}); // Debug log
                         
                         if (!groupedVideos[classCode]) {
