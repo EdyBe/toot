@@ -190,8 +190,8 @@ dropdownContent.addEventListener('mouseleave', function() {
             const studentFoldersContainer = document.createElement('div');
             studentFoldersContainer.className = 'student-folders-container';
 
-            Object.keys(students).forEach(studentEmail => {
-                if (!studentEmail) return; // Skip if email is undefined
+            Object.keys(students).forEach(firstName => {
+                if (!firstName) return; // Skip if email is undefined
                 
                 // Create student folder
                 const studentFolder = document.createElement('div');
@@ -199,7 +199,7 @@ dropdownContent.addEventListener('mouseleave', function() {
                 
                 // Use full email for folder title
                 studentFolder.innerHTML = `
-                    <div><i class="fas fa-folder"></i> ${studentEmail}</div>
+                    <div><i class="fas fa-folder"></i> ${firstName}</div>
                     <i class="fas fa-chevron-down arrow-icon"></i>
                 `;
                 
@@ -211,7 +211,7 @@ dropdownContent.addEventListener('mouseleave', function() {
                 studentFolderContent.style.gap = '10px';
                 
                 // Get videos for this student
-                const studentVideos = students[studentEmail] || [];
+                const studentVideos = students[firstName] || [];
 
                 // Add click handler for student folder
                 studentFolder.onclick = function(e) {
@@ -280,16 +280,16 @@ dropdownContent.addEventListener('mouseleave', function() {
                     console.log('First video object:', videos[0]); // Debug log
                     videos.forEach(video => {
                         const classCode = video.metadata?.classCode || 'Unknown Class';
-                        const studentEmail = video.metadata?.userEmail || 'Unknown Student';
-                        console.log('Processing video:', {classCode, studentEmail}); // Debug log
+                        const firstName = video.metadata?.userEmail || 'Unknown Student';
+                        console.log('Processing video:', {classCode, firstName}); // Debug log
                         
                         if (!groupedVideos[classCode]) {
                             groupedVideos[classCode] = {};
                         }
-                        if (!groupedVideos[classCode][studentEmail]) {
-                            groupedVideos[classCode][studentEmail] = [];
+                        if (!groupedVideos[classCode][firstName]) {
+                            groupedVideos[classCode][firstName] = [];
                         }
-                        groupedVideos[classCode][studentEmail].push(video);
+                        groupedVideos[classCode][firstName].push(video);
                     });
 
                     // Create folders for each class code
