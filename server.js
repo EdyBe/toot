@@ -545,19 +545,26 @@ app.get('/user-info', async (req, res) => {
             return res.status(400).json({ message: 'Email is required' });
         }
 
+        console.log('Fetching user info for:', email);
         const { user, videos } = await readUser(email);
         if (!user) {
+            console.error('User not found in database:', email);
             return res.status(404).json({ message: 'User not found' });
         }
 
+        console.log('Retrieved user:', user);
+        
         // Capitalize first name for display
         const capitalizedFirstName = user.firstName.charAt(0).toUpperCase() + user.firstName.slice(1);
         
-        res.json({
+        const responseData = {
             firstName: capitalizedFirstName,
             classCodes: user.classCodesArray,
             schoolName: user.schoolName
-        });
+        };
+        
+        console.log('Sending user info:', responseData);
+        res.json(responseData);
     } catch (error) {
         console.error('Error fetching user info:', error);
         res.status(500).json({ message: 'Failed to fetch user info' });
@@ -693,6 +700,8 @@ app.get('/videos', async (req, res) => {
         }
 
         // Get user details to determine account type
+        console.log('Fetching videos for:', email);
+        
         const { data: user, error: userError } = await supabase
             .from('users')
             .select('accountType, schoolName, classCodesArray')
@@ -700,28 +709,37 @@ app.get('/videos', async (req, res) => {
             .single();
 
         if (userError || !user) {
+            console.error('Error fetching user:', userError || 'User not found');
             throw userError || new Error('User not found');
         }
+
+        console.log('Retrieved user data:', user);
 
         let query = supabase
             .from('videos')
             .select('*');
 
         if (user.accountType === 'teacher') {
-            // For teachers, filter by school name and class codes
+            console.log('Filtering videos for teacher:', {
+                schoolName: user.schoolName,
+                classCodes: user.classCodesArray
+            });
             query = query
                 .eq('school_name', user.schoolName)
                 .in('class_code', user.classCodesArray);
         } else {
-            // For students, filter by user email
+            console.log('Filtering videos for student by email:', email);
             query = query.eq('user_email', email);
         }
 
         const { data: videos, error } = await query;
 
         if (error) {
+            console.error('Error fetching videos:', error);
             throw error;
         }
+
+        console.log('Retrieved videos:', videos);
 
         // Format videos for frontend
         const formattedVideos = videos.map(video => ({
@@ -736,6 +754,7 @@ app.get('/videos', async (req, res) => {
             }
         }));
 
+        console.log('Sending formatted videos:', formattedVideos);
         res.json(formattedVideos);
     } catch (error) {
         console.error('Error fetching videos:', error);
