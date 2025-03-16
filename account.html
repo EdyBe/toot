@@ -58,10 +58,16 @@
             }
 
             try {
-                const { user } = await readUser(email);
-                document.getElementById('user-name').innerText = `Name: ${user.firstName}`;
-                document.getElementById('class-codes').innerText = `Class Codes: ${user.classCodesArray.join(", ")}`;
-                document.getElementById('school-name').innerText = `School: ${user.school_name}`;
+                // Fetch user data using the /user-info endpoint
+                const response = await fetch(`/user-info?email=${encodeURIComponent(email)}`);
+                if (!response.ok) {
+                    throw new Error('Failed to fetch user info');
+                }
+                
+                const data = await response.json();
+                document.getElementById('user-name').innerText = `Name: ${data.firstName}`;
+                document.getElementById('class-codes').innerText = `Class Codes: ${data.classCodes.join(", ")}`;
+                document.getElementById('school-name').innerText = `School: ${data.schoolName}`;
             } catch (error) {
                 console.error('Error fetching user info:', error.message);
                 document.getElementById('error-message').innerText = 'Failed to load user information';
