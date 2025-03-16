@@ -186,39 +186,34 @@ dropdownContent.addEventListener('mouseleave', function() {
                     classFolderContent.style.display === 'none' ? 'block' : 'none';
             };
 
+            // Create a container for student folders
+            const studentFoldersContainer = document.createElement('div');
+            studentFoldersContainer.className = 'student-folders-container';
+
             Object.keys(students).forEach(studentEmail => {
                 if (!studentEmail) return; // Skip if email is undefined
                 
+                // Create student folder
                 const studentFolder = document.createElement('div');
                 studentFolder.className = 'folder student-folder';
                 
-                // Extract and format student name
-                const emailParts = studentEmail.split('@');
-                if (emailParts.length > 0) {
-                    const nameParts = emailParts[0].split('.');
-                    const firstName = nameParts[0] || 'Student';
-                    const capitalizedFirstName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
-                    
-                    studentFolder.innerHTML = `
-                        <div><i class="fas fa-folder"></i> ${capitalizedFirstName}</div>
-                        <i class="fas fa-chevron-down arrow-icon"></i>
-                    `;
-                } else {
-                    studentFolder.innerHTML = `
-                        <div><i class="fas fa-folder"></i> Student</div>
-                        <i class="fas fa-chevron-down arrow-icon"></i>
-                    `;
-                }
+                // Use full email for folder title
+                studentFolder.innerHTML = `
+                    <div><i class="fas fa-folder"></i> ${studentEmail}</div>
+                    <i class="fas fa-chevron-down arrow-icon"></i>
+                `;
                 
+                // Create content container for this student's videos
                 const studentFolderContent = document.createElement('div');
-                studentFolderContent.className = 'folder-content';
+                studentFolderContent.className = 'folder-content student-folder-content';
                 studentFolderContent.style.display = 'none';
                 studentFolderContent.style.gridTemplateColumns = 'repeat(auto-fill, minmax(150px, 1fr))';
                 studentFolderContent.style.gap = '10px';
                 
-                // Filter videos for this specific student
+                // Get videos for this student
                 const studentVideos = students[studentEmail] || [];
 
+                // Add click handler for student folder
                 studentFolder.onclick = function(e) {
                     e.stopPropagation();
                     this.classList.toggle('active');
@@ -234,9 +229,13 @@ dropdownContent.addEventListener('mouseleave', function() {
                     }
                 };
 
-                classFolderContent.appendChild(studentFolder);
-                classFolderContent.appendChild(studentFolderContent);
+                // Add student folder and content to container
+                studentFoldersContainer.appendChild(studentFolder);
+                studentFoldersContainer.appendChild(studentFolderContent);
             });
+
+            // Add student folders container to class folder content
+            classFolderContent.appendChild(studentFoldersContainer);
 
             videoCard.appendChild(classFolder);
             videoCard.appendChild(classFolderContent);
