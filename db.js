@@ -1,4 +1,5 @@
-const { createClient } = require('@supabase/supabase-js'); // Import Supabase client
+// Use ES modules for browser compatibility
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
 // Supabase Configuration
 const supabaseUrl = process.env.SUPABASE_URL; // Supabase URL from environment variables
@@ -255,4 +256,5 @@ async function storeVideoMetadata(videoData) {
 }
 
 
-module.exports = { createUser, readUser, updateUser, deleteUser, uploadVideo, storeVideoMetadata };
+// Export functions for browser use
+export { createUser, readUser, updateUser, deleteUser, uploadVideo, storeVideoMetadata };
