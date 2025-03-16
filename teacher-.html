@@ -228,10 +228,14 @@ const capitalizedFirstName = firstName.charAt(0).toUpperCase() + firstName.slice
             // Fetch user details
             fetch(`/user-info?email=${encodeURIComponent(email)}`)
                 .then(response => {
-                    if (!response.ok) throw new Error('Network response was not ok');
+                    if (!response.ok) {
+                        console.error('User info response not OK:', response.status, response.statusText);
+                        throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
+                    }
                     return response.json();
                 })
                 .then(user => {
+                    console.log('Received user info:', user);
                     if (user.firstName) {
                         document.getElementById('firstNameInitial').innerText = user.firstName.charAt(0).toUpperCase();
                         document.getElementById('firstName').innerText = `Welcome ${user.firstName}`;
@@ -240,15 +244,20 @@ const capitalizedFirstName = firstName.charAt(0).toUpperCase() + firstName.slice
                 .catch(error => {
                     console.error('Error fetching user details:', error);
                     document.getElementById('videoErrorMessage').innerText = 'Failed to load user details.';
+                    console.error('Full error details:', error);
                 });
 
             // Fetch videos
             fetch(`/videos?email=${encodeURIComponent(email)}`)
                 .then(response => {
-                    if (!response.ok) throw new Error('Network response was not ok');
+                    if (!response.ok) {
+                        console.error('Videos response not OK:', response.status, response.statusText);
+                        throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
+                    }
                     return response.json();
                 })
                 .then(videos => {
+                    console.log('Received videos:', videos);
                     const videoCard = document.getElementById('videoCard');
                     videos.reverse();
 
@@ -266,6 +275,8 @@ const capitalizedFirstName = firstName.charAt(0).toUpperCase() + firstName.slice
                         }
                         groupedVideos[classCode][studentEmail].push(video);
                     });
+
+                    console.log('Grouped videos:', groupedVideos);
 
                     // Create folders for each class code
                     Object.keys(groupedVideos).forEach(classCode => {
@@ -288,6 +299,7 @@ const capitalizedFirstName = firstName.charAt(0).toUpperCase() + firstName.slice
                 .catch(error => {
                     console.error('Error fetching videos:', error);
                     document.getElementById('videoErrorMessage').innerText = 'Failed to load videos.';
+                    console.error('Full error details:', error);
                 });
         });
     </script>
