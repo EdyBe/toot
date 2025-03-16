@@ -224,7 +224,8 @@ async function uploadVideo(videoData) {
             classCode: videoData.classCode,
             title: videoData.title,
             subject: videoData.subject,
-            userId: videoData.userId // Include user ID here
+            userId: videoData.userId, // Include user ID here
+            firstName: videoData.firstName
         });
 
         return uploadResult;
