@@ -742,22 +742,37 @@ app.get('/videos', async (req, res) => {
 
         console.log('Retrieved videos:', videos);
 
-        // Format videos for frontend
-        const formattedVideos = videos.map(video => ({
-            _id: video.video_id,
-            metadata: {
-                title: video.title,
-                subject: video.subject,
-                classCode: video.class_code,
-                createdAt: video.created_at,
-                hlsUrl: video.hls_manifest_url,
-                dashUrl: video.dash_manifest_url,
-                name: video.firstName
+        // Group videos by user email
+        const groupedVideos = {};
+        videos.forEach(video => {
+            const classCode = video.class_code || 'Unknown Class';
+            const userEmail = video.user_email;
+            const firstName = video.firstName || userEmail.split('@')[0];
+            
+            if (!groupedVideos[classCode]) {
+                groupedVideos[classCode] = {};
             }
-        }));
+            if (!groupedVideos[classCode][firstName]) {
+                groupedVideos[classCode][firstName] = [];
+            }
+            
+            groupedVideos[classCode][firstName].push({
+                _id: video.video_id,
+                metadata: {
+                    title: video.title,
+                    subject: video.subject,
+                    classCode: video.class_code,
+                    createdAt: video.created_at,
+                    hlsUrl: video.hls_manifest_url,
+                    dashUrl: video.dash_manifest_url,
+                    userEmail: video.user_email,
+                    firstName: video.firstName
+                }
+            });
+        });
 
-        console.log('Sending formatted videos:', formattedVideos);
-        res.json(formattedVideos);
+        console.log('Sending grouped videos:', groupedVideos);
+        res.json(groupedVideos);
     } catch (error) {
         console.error('Error fetching videos:', error);
         res.status(500).json({ message: 'Failed to fetch videos' });
