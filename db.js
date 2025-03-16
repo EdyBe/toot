@@ -65,44 +65,64 @@ async function createUser(userData) {
  * @throws {Error} If user is not found
  */
 async function readUser(email) {
-    const { data, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('email', email)
-        .single();
-
-    if (error) {
-        throw new Error('User not found: ' + error.message);
-    }
-
-    let videosData;
-    let videosError;
-
-    if (data.accountType === 'student') {
-        // Fetch videos associated with the student
-        ({ data: videosData, error: videosError } = await supabase
-            .from('videos')
+    try {
+        console.log('Fetching user data for:', email);
+        const { data, error } = await supabase
+            .from('users')
             .select('*')
-            .eq('user_id', data.id));
-    } else if (data.accountType === 'teacher') {
-        // Fetch videos associated with the teacher based on school name and class code
-        ({ data: videosData, error: videosError } = await supabase
-            .from('videos')
-            .select('*')
-            .eq('school_name', data.school_name) // Assuming school_name is part of user data
-            .eq('class_code', data.class_code)); // Assuming class_code is part of user data
+            .eq('email', email)
+            .single();
+
+        if (error) {
+            console.error('Error fetching user:', error);
+            throw new Error('User not found: ' + error.message);
+        }
+
+        console.log('Retrieved user data:', data);
+
+        let videosData = [];
+        if (data.accountType === 'student') {
+            console.log('Fetching student videos for user:', data.id);
+            const { data: studentVideos, error: studentVideosError } = await supabase
+                .from('videos')
+                .select('*')
+                .eq('user_id', data.id);
+
+            if (studentVideosError) {
+                console.error('Error fetching student videos:', studentVideosError);
+                throw new Error('Error fetching student videos: ' + studentVideosError.message);
+            }
+            videosData = studentVideos;
+        } else if (data.accountType === 'teacher') {
+            console.log('Fetching teacher videos for:', {
+                schoolName: data.school_name,
+                classCodes: data.classCodesArray
+            });
+            const { data: teacherVideos, error: teacherVideosError } = await supabase
+                .from('videos')
+                .select('*')
+                .eq('school_name', data.school_name)
+                .in('class_code', data.classCodesArray);
+
+            if (teacherVideosError) {
+                console.error('Error fetching teacher videos:', teacherVideosError);
+                throw new Error('Error fetching teacher videos: ' + teacherVideosError.message);
+            }
+            videosData = teacherVideos;
+        }
+
+        console.log('Retrieved videos:', videosData);
+
+        const videos = videosData.map(video => ({
+            videoUid: video.video_id,
+            accountId: process.env.CLOUDFLARE_ACCOUNT_ID
+        }));
+
+        return { user: data, videos };
+    } catch (error) {
+        console.error('Error in readUser:', error);
+        throw error;
     }
-
-    if (videosError) {
-        throw new Error('Error fetching videos: ' + videosError.message);
-    }
-
-    const videos = videosData.map(video => ({
-        videoUid: video.video_id, // Assuming video_id is the UID
-        accountId: process.env.CLOUDFLARE_ACCOUNT_ID // Use the account ID from environment variables
-    }));
-
-    return { user: data, videos };
 }
 
 /**
@@ -233,19 +253,5 @@ async function storeVideoMetadata(videoData) {
     return data[0];
 }
 
-// Function to retrieve videos for a teacher
-async function getVideosForTeacher(schoolName, classCode) {
-    const { data, error } = await supabase
-        .from('videos')
-        .select('*')
-        .eq('school_name', schoolName)
-        .eq('class_code', classCode);
-
-    if (error) {
-        throw new Error('Failed to retrieve videos: ' + error.message);
-    }
-
-    return data; // This will return an array of video metadata
-}
 
 module.exports = { createUser, readUser, updateUser, deleteUser, uploadVideo, storeVideoMetadata, getVideosForTeacher };
