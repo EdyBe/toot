@@ -268,100 +268,62 @@ const capitalizedFirstName = firstName.charAt(0).toUpperCase() + firstName.slice
             }));
         };
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            const videos = await fetchTeacherVideos();
-            if (videos.length === 0) return;
+        
+document.addEventListener('DOMContentLoaded', async () => {
+    const videos = await fetchTeacherVideos();
+    if (videos.length === 0) return;
 
-            const videoCard = document.getElementById('videoCard');
-            videos.reverse();
+    const videoCard = document.getElementById('videoCard');
+    videos.reverse();
 
-            // Group videos by class code and student
-            const groupedVideos = {};
-            videos.forEach(video => {
-                const classCode = video.metadata.classCode;
-                const studentEmail = video.metadata.userEmail;
-                
-                if (!groupedVideos[classCode]) {
-                    groupedVideos[classCode] = {};
-                }
-                if (!groupedVideos[classCode][studentEmail]) {
-                    groupedVideos[classCode][studentEmail] = [];
-                }
-                groupedVideos[classCode][studentEmail].push(video);
+    // Group videos by class code and student
+    const groupedVideos = {};
+    videos.forEach(video => {
+        const classCode = video.metadata.classCode;
+        const studentEmail = video.metadata.userEmail;
+        
+        if (!groupedVideos[classCode]) {
+            groupedVideos[classCode] = {};
+        }
+        if (!groupedVideos[classCode][studentEmail]) {
+            groupedVideos[classCode][studentEmail] = [];
+        }
+        groupedVideos[classCode][studentEmail].push(video);
+    });
+
+    // Create folders for each class code
+    Object.keys(groupedVideos).forEach(classCode => {
+        createClassCodeFolder(classCode, groupedVideos[classCode]);
+    });
+
+    // Add viewed functionality
+    document.querySelectorAll('.video-item').forEach(videoItem => {
+        const videoPlayer = videoItem.querySelector('iframe');
+        videoPlayer.onload = () => {
+            const videoId = videoPlayer.src.split('/').pop();
+            fetch('/videos/view', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ id: videoId })
             });
+        };
+    });
 
-            // Create folders for each class code
-            Object.keys(groupedVideos).forEach(classCode => {
-                createClassCodeFolder(classCode, groupedVideos[classCode]);
-            });
-                then(response => {
-                    if (!response.ok) {
-                        console.error('Videos response not OK:', response.status, response.statusText);
-                        throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
-                    }
-                    return response.json();
-                })
-                .then(videos => {
-                    console.log('Received videos:', videos);
-                    const videoCard = document.getElementById('videoCard');
-                    videos.reverse();
-
-                    // Group videos by class code and student
-                    const groupedVideos = {};
-                    videos.forEach(video => {
-                        const classCode = video.metadata.classCode;
-                        const studentEmail = video.metadata.userEmail;
-                        
-                        if (!groupedVideos[classCode]) {
-                            groupedVideos[classCode] = {};
-                        }
-                        if (!groupedVideos[classCode][studentEmail]) {
-                            groupedVideos[classCode][studentEmail] = [];
-                        }
-                        groupedVideos[classCode][studentEmail].push(video);
-                    });
-
-                    console.log('Grouped videos:', groupedVideos);
-
-                    // Create folders for each class code
-                    Object.keys(groupedVideos).forEach(classCode => {
-                        createClassCodeFolder(classCode, groupedVideos[classCode]);
-                    });
-
-                    // Add viewed functionality
-                    document.querySelectorAll('.video-item').forEach(videoItem => {
-                        const videoPlayer = videoItem.querySelector('iframe');
-                        videoPlayer.onload = () => {
-                            const videoId = videoPlayer.src.split('/').pop();
-                            fetch('/videos/view', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify({ id: videoId })
-                            });
-                        };
-                    });
-
-                    // Search functionality
-                    const searchInput = document.getElementById('searchInput');
-                    searchInput.addEventListener('input', () => {
-                        const searchTerm = searchInput.value;
-                        // Only filter videos if a student folder is open
-                        if (currentStudentVideos) {
-                            const openStudentContent = document.querySelector('.student-folder.active + .folder-content');
-                            if (openStudentContent) {
-                                filterAndDisplayVideos(currentStudentVideos, openStudentContent, searchTerm);
-                            }
-                        }
-                    });
-                })
-                .catch(error => {
-                    console.error('Error fetching videos:', error);
-                    document.getElementById('videoErrorMessage').innerText = 'Failed to load videos.';
-                    console.error('Full error details:', error);
-                });
-        });
+    // Search functionality
+    const searchInput = document.getElementById('searchInput');
+    searchInput.addEventListener('input', () => {
+        const searchTerm = searchInput.value;
+        // Only filter videos if a student folder is open
+        if (currentStudentVideos) {
+            const openStudentContent = document.querySelector('.student-folder.active + .folder-content');
+            if (openStudentContent) {
+                filterAndDisplayVideos(currentStudentVideos, openStudentContent, searchTerm);
+            }
+        }
+    });
+});
     </script>
     <script src="script.js"></script>
 </body>
