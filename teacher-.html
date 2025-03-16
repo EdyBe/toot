@@ -48,8 +48,8 @@
     
     <script>
         let currentOpenClassCode = null;
-        let currentOpenStudent = null;
-        let currentStudentVideos = null;
+        let currentOpenVideoFolder = null;
+        let currentVideoItems = null;
 
         function toggleDropdown(dropdownId) {
             const dropdown = document.getElementById(dropdownId);
@@ -92,7 +92,7 @@ dropdownContent.addEventListener('mouseleave', function() {
     dropdownContent.style.display = "none";
 });
 
-        function createVideoItem(video, studentFolderContent) {
+        function createVideoItem(video, videoFolderContent) {
             const videoItem = document.createElement('div');
             videoItem.className = 'video-item';
 
@@ -137,7 +137,7 @@ dropdownContent.addEventListener('mouseleave', function() {
             viewCount.innerText = `Views: ${video.metadata.views || 0}`;
             videoItem.appendChild(viewCount);
 
-            studentFolderContent.appendChild(videoItem);
+            videoFolderContent.appendChild(videoItem);
 
         videoPlayer.addEventListener('load', () => {
             // Track video view when player loads
@@ -168,7 +168,7 @@ dropdownContent.addEventListener('mouseleave', function() {
             filteredVideos.forEach(video => createVideoItem(video, folderContent));
         }
 
-        function createClassCodeFolder(classCode, students) {
+        function createClassCodeFolder(classCode, videos) {
             const classFolder = document.createElement('div');
             classFolder.className = 'folder';
             classFolder.innerHTML = `
@@ -186,56 +186,56 @@ dropdownContent.addEventListener('mouseleave', function() {
                     classFolderContent.style.display === 'none' ? 'block' : 'none';
             };
 
-            // Create a container for student folders
-            const studentFoldersContainer = document.createElement('div');
-            studentFoldersContainer.className = 'student-folders-container';
+            // Create a container for video folders
+            const videoFoldersContainer = document.createElement('div');
+            videoFoldersContainer.className = 'video-folders-container';
 
-            Object.keys(students).forEach(firstName => {
-                if (!firstName) return; // Skip if email is undefined
+            Object.keys(videos).forEach(videoName => {
+                if (!videoName) return; // Skip if video name is undefined
                 
-                // Create student folder
-                const studentFolder = document.createElement('div');
-                studentFolder.className = 'folder student-folder';
+                // Create video name folder
+                const videoFolder = document.createElement('div');
+                videoFolder.className = 'folder video-folder';
                 
-                // Use full email for folder title
-                studentFolder.innerHTML = `
-                    <div><i class="fas fa-folder"></i> ${firstName}</div>
+                // Use video name for folder title
+                videoFolder.innerHTML = `
+                    <div><i class="fas fa-folder"></i> ${videoName}</div>
                     <i class="fas fa-chevron-down arrow-icon"></i>
                 `;
                 
-                // Create content container for this student's videos
-                const studentFolderContent = document.createElement('div');
-                studentFolderContent.className = 'folder-content student-folder-content';
-                studentFolderContent.style.display = 'none';
-                studentFolderContent.style.gridTemplateColumns = 'repeat(auto-fill, minmax(150px, 1fr))';
-                studentFolderContent.style.gap = '10px';
+                // Create content container for this video's items
+                const videoFolderContent = document.createElement('div');
+                videoFolderContent.className = 'folder-content video-folder-content';
+                videoFolderContent.style.display = 'none';
+                videoFolderContent.style.gridTemplateColumns = 'repeat(auto-fill, minmax(150px, 1fr))';
+                videoFolderContent.style.gap = '10px';
                 
-                // Get videos for this student
-                const studentVideos = students[firstName] || [];
+                // Get videos for this video name
+                const videoItems = videos[videoName] || [];
 
-                // Add click handler for student folder
-                studentFolder.onclick = function(e) {
+                // Add click handler for video folder
+                videoFolder.onclick = function(e) {
                     e.stopPropagation();
                     this.classList.toggle('active');
-                    studentFolderContent.style.display = 
-                        studentFolderContent.style.display === 'none' ? 'grid' : 'none';
+                    videoFolderContent.style.display = 
+                        videoFolderContent.style.display === 'none' ? 'grid' : 'none';
                     
-                    if (studentFolderContent.style.display === 'grid') {
-                        // Store current student's videos for searching
-                        currentStudentVideos = studentVideos;
+                    if (videoFolderContent.style.display === 'grid') {
+                        // Store current video's items for searching
+                        currentVideoItems = videoItems;
                         // Display videos with current search term
                         const searchTerm = document.getElementById('searchInput').value;
-                        filterAndDisplayVideos(studentVideos, studentFolderContent, searchTerm);
+                        filterAndDisplayVideos(videoItems, videoFolderContent, searchTerm);
                     }
                 };
 
-                // Add student folder and content to container
-                studentFoldersContainer.appendChild(studentFolder);
-                studentFoldersContainer.appendChild(studentFolderContent);
+                // Add video folder and content to container
+                videoFoldersContainer.appendChild(videoFolder);
+                videoFoldersContainer.appendChild(videoFolderContent);
             });
 
-            // Add student folders container to class folder content
-            classFolderContent.appendChild(studentFoldersContainer);
+            // Add video folders container to class folder content
+            classFolderContent.appendChild(videoFoldersContainer);
 
             videoCard.appendChild(classFolder);
             videoCard.appendChild(classFolderContent);
@@ -275,21 +275,21 @@ dropdownContent.addEventListener('mouseleave', function() {
                     const videoCard = document.getElementById('videoCard');
                     videos.reverse();
 
-                    // Group videos by class code and student
+                    // Group videos by class code and video name
                     const groupedVideos = {};
                     console.log('First video object:', videos[0]); // Debug log
                     videos.forEach(video => {
                         const classCode = video.metadata?.classCode || 'Unknown Class';
-                        const firstName = video.metadata?.firstName || 'Unknown Student';
-                        console.log('Processing video:', {classCode, firstName}); // Debug log
+                        const videoName = video.metadata?.title || 'Untitled Video';
+                        console.log('Processing video:', {classCode, videoName}); // Debug log
                         
                         if (!groupedVideos[classCode]) {
                             groupedVideos[classCode] = {};
                         }
-                        if (!groupedVideos[classCode][firstName]) {
-                            groupedVideos[classCode][firstName] = [];
+                        if (!groupedVideos[classCode][videoName]) {
+                            groupedVideos[classCode][videoName] = [];
                         }
-                        groupedVideos[classCode][firstName].push(video);
+                        groupedVideos[classCode][videoName].push(video);
                     });
 
                     // Create folders for each class code
@@ -301,11 +301,11 @@ dropdownContent.addEventListener('mouseleave', function() {
                     const searchInput = document.getElementById('searchInput');
                     searchInput.addEventListener('input', () => {
                         const searchTerm = searchInput.value;
-                        // Only filter videos if a student folder is open
-                        if (currentStudentVideos) {
-                            const openStudentContent = document.querySelector('.student-folder.active + .folder-content');
-                            if (openStudentContent) {
-                                filterAndDisplayVideos(currentStudentVideos, openStudentContent, searchTerm);
+                        // Only filter videos if a video folder is open
+                        if (currentVideoItems) {
+                            const openVideoContent = document.querySelector('.video-folder.active + .folder-content');
+                            if (openVideoContent) {
+                                filterAndDisplayVideos(currentVideoItems, openVideoContent, searchTerm);
                             }
                         }
                     });
