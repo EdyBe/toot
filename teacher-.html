@@ -46,7 +46,13 @@
     </div>
     <div id="videoErrorMessage" class="error-message"></div>
     
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
+        // Initialize Supabase client for frontend
+        const supabaseUrl = process.env.SUPABASE_URL;
+        const supabaseKey = process.env.SUPABASE_KEY;
+        const supabase = createClient(supabaseUrl, supabaseKey);
+
         let currentOpenClassCode = null;
         let currentOpenStudent = null;
         let currentStudentVideos = null;
