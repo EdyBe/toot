@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <!-- [Previous head and header sections remain the same] -->
 <head>
@@ -218,47 +218,83 @@ const capitalizedFirstName = firstName.charAt(0).toUpperCase() + firstName.slice
             videoCard.appendChild(classFolderContent);
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const email = sessionStorage.getItem('userEmail');
-            if (!email) {
+        const fetchTeacherVideos = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+
+            if (!user) {
+                console.error("User not authenticated");
                 document.getElementById('videoErrorMessage').innerText = 'User not authenticated';
-                return;
+                return [];
             }
 
-            // Fetch user details
-            fetch(`/user-info?email=${encodeURIComponent(email)}`)
-                .then(response => {
-                    if (!response.ok) {
-                        console.error('User info response not OK:', response.status, response.statusText);
-                        throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
-                    }
-                    return response.json();
-                })
-                .then(user => {
-                    console.log('Received user info:', user);
-                    if (user.firstName) {
-                        document.getElementById('firstNameInitial').innerText = user.firstName.charAt(0).toUpperCase();
-                        document.getElementById('firstName').innerText = `Welcome ${user.firstName}`;
-                    }
-                })
-                .catch(error => {
-                    console.error('Error fetching user details:', error);
-                    document.getElementById('videoErrorMessage').innerText = 'Failed to load user details.';
-                    console.error('Full error details:', error);
-                });
+            // Display user info
+            if (user.user_metadata?.firstName) {
+                const firstName = user.user_metadata.firstName;
+                document.getElementById('firstNameInitial').innerText = firstName.charAt(0).toUpperCase();
+                document.getElementById('firstName').innerText = `Welcome ${firstName}`;
+            }
 
-            // Fetch videos
-            // First fetch user details to get school name and class codes
-            fetch(`/user-info?email=${encodeURIComponent(email)}`)
-                .then(response => {
-                    if (!response.ok) throw new Error('Network response was not ok');
-                    return response.json();
-                })
-                .then(user => {
-                    // Then fetch videos filtered by school name and class codes
-                    return fetch(`/videos?school=${encodeURIComponent(user.schoolName)}&classCodes=${user.classCodesArray.join(',')}`);
-                })
-                .then(response => {
+            const schoolName = user.user_metadata?.school_name;
+            const classCodes = user.user_metadata?.classCodesArray;
+
+            if (!schoolName || !classCodes) {
+                console.error("Missing school name or class codes in user metadata");
+                return [];
+            }
+
+            const { data, error } = await supabase
+                .from('videos')
+                .select('video_id, hls_manifest_url, dash_manifest_url, title, subject, class_code, user_email, created_at')
+                .eq('school_name', schoolName)
+                .in('class_code', classCodes);
+
+            if (error) {
+                console.error("Error fetching videos:", error);
+                document.getElementById('videoErrorMessage').innerText = 'Failed to load videos.';
+                return [];
+            }
+
+            return data.map(video => ({
+                _id: video.video_id,
+                metadata: {
+                    title: video.title,
+                    subject: video.subject,
+                    classCode: video.class_code,
+                    createdAt: video.created_at,
+                    hlsUrl: video.hls_manifest_url,
+                    dashUrl: video.dash_manifest_url,
+                    userEmail: video.user_email
+                }
+            }));
+        };
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const videos = await fetchTeacherVideos();
+            if (videos.length === 0) return;
+
+            const videoCard = document.getElementById('videoCard');
+            videos.reverse();
+
+            // Group videos by class code and student
+            const groupedVideos = {};
+            videos.forEach(video => {
+                const classCode = video.metadata.classCode;
+                const studentEmail = video.metadata.userEmail;
+                
+                if (!groupedVideos[classCode]) {
+                    groupedVideos[classCode] = {};
+                }
+                if (!groupedVideos[classCode][studentEmail]) {
+                    groupedVideos[classCode][studentEmail] = [];
+                }
+                groupedVideos[classCode][studentEmail].push(video);
+            });
+
+            // Create folders for each class code
+            Object.keys(groupedVideos).forEach(classCode => {
+                createClassCodeFolder(classCode, groupedVideos[classCode]);
+            });
+                then(response => {
                     if (!response.ok) {
                         console.error('Videos response not OK:', response.status, response.statusText);
                         throw new Error(`Network response was not ok: ${response.status} ${response.statusText}`);
