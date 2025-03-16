@@ -269,10 +269,6 @@ p{
     overflow: hidden;
 }
 
-.video-item {
-    width: 100%;
-    margin: 10px auto;
-}
 
 /* Media queries for different screen sizes */
 @media (max-width: 768px) {
