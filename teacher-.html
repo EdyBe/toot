@@ -273,28 +273,10 @@ dropdownContent.addEventListener('mouseleave', function() {
                 })
                 .then(videos => {
                     const videoCard = document.getElementById('videoCard');
-                    videos.reverse();
-
-                    // Group videos by class code and video name
-                    const groupedVideos = {};
-                    console.log('First video object:', videos[0]); // Debug log
-                    videos.forEach(video => {
-                        const classCode = video.metadata?.classCode || 'Unknown Class';
-                        const videoName = video.metadata?.title || 'Untitled Video';
-                        console.log('Processing video:', {classCode, videoName}); // Debug log
-                        
-                        if (!groupedVideos[classCode]) {
-                            groupedVideos[classCode] = {};
-                        }
-                        if (!groupedVideos[classCode][videoName]) {
-                            groupedVideos[classCode][videoName] = [];
-                        }
-                        groupedVideos[classCode][videoName].push(video);
-                    });
-
-                    // Create folders for each class code
-                    Object.keys(groupedVideos).forEach(classCode => {
-                        createClassCodeFolder(classCode, groupedVideos[classCode]);
+                    
+                    // Process the grouped videos structure
+                    Object.keys(videos).forEach(classCode => {
+                        createClassCodeFolder(classCode, videos[classCode]);
                     });
 
                     // Search functionality
