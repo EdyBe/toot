@@ -278,8 +278,8 @@ dropdownContent.addEventListener('mouseleave', function() {
                     // Group videos by class code and student
                     const groupedVideos = {};
                     videos.forEach(video => {
-                        const classCode = video.class_code;
-                        const studentEmail = video.user_email;
+                        const classCode = video.metadata.class_code;
+                        const studentEmail = video.metadata.user_email;
                         
                         if (!groupedVideos[classCode]) {
                             groupedVideos[classCode] = {};
