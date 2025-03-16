@@ -190,48 +190,48 @@ dropdownContent.addEventListener('mouseleave', function() {
             const videoFoldersContainer = document.createElement('div');
             videoFoldersContainer.className = 'video-folders-container';
 
-            Object.keys(videos).forEach(videoName => {
-                if (!videoName) return; // Skip if video name is undefined
+        Object.keys(videos).forEach(firstName => {
+            if (!firstName) return; // Skip if first name is undefined
                 
-                // Create video name folder
-                const videoFolder = document.createElement('div');
-                videoFolder.className = 'folder video-folder';
+                // Create user folder
+                const userFolder = document.createElement('div');
+                userFolder.className = 'folder video-folder';
                 
-                // Use video name for folder title
-                videoFolder.innerHTML = `
-                    <div><i class="fas fa-folder"></i> ${videoName}</div>
+                // Use first name for folder title
+                userFolder.innerHTML = `
+                    <div><i class="fas fa-folder"></i> ${firstName}</div>
                     <i class="fas fa-chevron-down arrow-icon"></i>
                 `;
                 
-                // Create content container for this video's items
-                const videoFolderContent = document.createElement('div');
-                videoFolderContent.className = 'folder-content video-folder-content';
-                videoFolderContent.style.display = 'none';
-                videoFolderContent.style.gridTemplateColumns = 'repeat(auto-fill, minmax(150px, 1fr))';
-                videoFolderContent.style.gap = '10px';
+                // Create content container for this user's videos
+                const userFolderContent = document.createElement('div');
+                userFolderContent.className = 'folder-content video-folder-content';
+                userFolderContent.style.display = 'none';
+                userFolderContent.style.gridTemplateColumns = 'repeat(auto-fill, minmax(150px, 1fr))';
+                userFolderContent.style.gap = '10px';
                 
-                // Get videos for this video name
-                const videoItems = videos[videoName] || [];
+                // Get videos for this user
+                const videoItems = videos[firstName] || [];
 
                 // Add click handler for video folder
-                videoFolder.onclick = function(e) {
+                userFolder.onclick = function(e) {
                     e.stopPropagation();
                     this.classList.toggle('active');
-                    videoFolderContent.style.display = 
-                        videoFolderContent.style.display === 'none' ? 'grid' : 'none';
+                    userFolderContent.style.display = 
+                        userFolderContent.style.display === 'none' ? 'grid' : 'none';
                     
-                    if (videoFolderContent.style.display === 'grid') {
+                    if (userFolderContent.style.display === 'grid') {
                         // Store current video's items for searching
                         currentVideoItems = videoItems;
                         // Display videos with current search term
                         const searchTerm = document.getElementById('searchInput').value;
-                        filterAndDisplayVideos(videoItems, videoFolderContent, searchTerm);
+                        filterAndDisplayVideos(videoItems, userFolderContent, searchTerm);
                     }
                 };
 
                 // Add video folder and content to container
-                videoFoldersContainer.appendChild(videoFolder);
-                videoFoldersContainer.appendChild(videoFolderContent);
+                videoFoldersContainer.appendChild(userFolder);
+                videoFoldersContainer.appendChild(userFolderContent);
             });
 
             // Add video folders container to class folder content
@@ -280,7 +280,7 @@ dropdownContent.addEventListener('mouseleave', function() {
                     console.log('First video object:', videos[0]); // Debug log
                     videos.forEach(video => {
                         const classCode = video.metadata?.classCode || 'Unknown Class';
-                        const videoName = video.metadata?.firstName || 'Untitled Video';
+                        const videoName = video.metadata?.title || 'Untitled Video';
                         console.log('Processing video:', {classCode, videoName}); // Debug log
                         
                         if (!groupedVideos[classCode]) {
