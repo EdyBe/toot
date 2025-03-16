@@ -46,8 +46,9 @@
         </div>
     </div>
 
-    <script src="db.js"></script>
-    <script>
+    <script type="module">
+        import { updateUser, deleteUser } from './db.js';
+        
         // Fetch user information when the page loads
         window.onload = async function() {
             const email = sessionStorage.getItem('userEmail'); // Get the email from sessionStorage
