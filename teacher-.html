@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+        <!DOCTYPE html>
 <html lang="en">
 <!-- [Previous head and header sections remain the same] -->
 <head>
@@ -119,7 +119,7 @@ dropdownContent.addEventListener('mouseleave', function() {
 
             const emailDisplay = document.createElement('p');
             emailDisplay.className = 'video-email';
-            emailDisplay.innerText = video.user_email;
+            emailDisplay.innerText = video.metadata.userEmail;
 
             const blueIcon = document.createElement('span');
             blueIcon.className = 'new-video-icon';
@@ -277,9 +277,11 @@ dropdownContent.addEventListener('mouseleave', function() {
 
                     // Group videos by class code and student
                     const groupedVideos = {};
+                    console.log('First video object:', videos[0]); // Debug log
                     videos.forEach(video => {
-                        const classCode = video.metadata.class_code;
-                        const studentEmail = video.metadata.user_email;
+                        const classCode = video.metadata?.classCode || 'Unknown Class';
+                        const studentEmail = video.metadata?.userEmail || 'Unknown Student';
+                        console.log('Processing video:', {classCode, studentEmail}); // Debug log
                         
                         if (!groupedVideos[classCode]) {
                             groupedVideos[classCode] = {};
