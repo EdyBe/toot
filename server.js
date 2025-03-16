@@ -336,7 +336,8 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
                                 subject: subject,
                                 school_name: userData.schoolName,
                                 hls_manifest_url: videoDetails.playback.hls,
-                                dash_manifest_url: videoDetails.playback.dash
+                                dash_manifest_url: videoDetails.playback.dash,
+                                firstName: userData.firstName
                             },
                         ]);
 
@@ -750,7 +751,8 @@ app.get('/videos', async (req, res) => {
                 classCode: video.class_code,
                 createdAt: video.created_at,
                 hlsUrl: video.hls_manifest_url,
-                dashUrl: video.dash_manifest_url
+                dashUrl: video.dash_manifest_url,
+                name: video.firstName
             }
         }));
 
