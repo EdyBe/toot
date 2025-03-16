@@ -48,6 +48,7 @@
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
+        require('dotenv').config(); // Load environment variables from .env file
         // Initialize Supabase client for frontend
         const supabaseUrl = process.env.SUPABASE_URL;
         const supabaseKey = process.env.SUPABASE_KEY;
