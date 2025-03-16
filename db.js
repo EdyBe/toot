@@ -254,4 +254,4 @@ async function storeVideoMetadata(videoData) {
 }
 
 
-module.exports = { createUser, readUser, updateUser, deleteUser, uploadVideo, storeVideoMetadata, getVideosForTeacher };
+module.exports = { createUser, readUser, updateUser, deleteUser, uploadVideo, storeVideoMetadata };
