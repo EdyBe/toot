@@ -1,4 +1,5 @@
-
+// Import Supabase client
+const { createClient } = require('@supabase/supabase-js');
 
 // Supabase Configuration
 const supabaseUrl = process.env.SUPABASE_URL; // Supabase URL from environment variables
@@ -255,5 +256,5 @@ async function storeVideoMetadata(videoData) {
 }
 
 
-// Export functions for browser use
-export { createUser, readUser, updateUser, deleteUser, uploadVideo, storeVideoMetadata };
+// Export functions
+module.exports = { createUser, readUser, updateUser, deleteUser, uploadVideo, storeVideoMetadata };
