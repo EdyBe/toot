@@ -1,10 +1,3 @@
-
-
-// Supabase Configuration
-const supabaseUrl = process.env.SUPABASE_URL; // Supabase URL from environment variables
-const supabaseKey = process.env.SUPABASE_KEY; // Supabase Key from environment variables
-const supabase = createClient(supabaseUrl, supabaseKey);
-
 // License Key Management System
 const licenseKeyLimits = {
     "BurnsideHighSchool": 4,
