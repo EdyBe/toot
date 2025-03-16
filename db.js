@@ -1,5 +1,4 @@
-// Use ES modules for browser compatibility
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+
 
 // Supabase Configuration
 const supabaseUrl = process.env.SUPABASE_URL; // Supabase URL from environment variables
