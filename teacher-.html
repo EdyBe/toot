@@ -248,7 +248,16 @@ const capitalizedFirstName = firstName.charAt(0).toUpperCase() + firstName.slice
                 });
 
             // Fetch videos
-            fetch(`/videos?email=${encodeURIComponent(email)}`)
+            // First fetch user details to get school name and class codes
+            fetch(`/user-info?email=${encodeURIComponent(email)}`)
+                .then(response => {
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    return response.json();
+                })
+                .then(user => {
+                    // Then fetch videos filtered by school name and class codes
+                    return fetch(`/videos?school=${encodeURIComponent(user.schoolName)}&classCodes=${user.classCodesArray.join(',')}`);
+                })
                 .then(response => {
                     if (!response.ok) {
                         console.error('Videos response not OK:', response.status, response.statusText);
@@ -281,6 +290,21 @@ const capitalizedFirstName = firstName.charAt(0).toUpperCase() + firstName.slice
                     // Create folders for each class code
                     Object.keys(groupedVideos).forEach(classCode => {
                         createClassCodeFolder(classCode, groupedVideos[classCode]);
+                    });
+
+                    // Add viewed functionality
+                    document.querySelectorAll('.video-item').forEach(videoItem => {
+                        const videoPlayer = videoItem.querySelector('iframe');
+                        videoPlayer.onload = () => {
+                            const videoId = videoPlayer.src.split('/').pop();
+                            fetch('/videos/view', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({ id: videoId })
+                            });
+                        };
                     });
 
                     // Search functionality
