@@ -59,91 +59,85 @@
         }
 
         window.onclick = function(event) {
-    if (!event.target.matches('.profile-icon') && !event.target.closest('.dropdown-content')) {
-        const dropdowns = document.getElementsByClassName("dropdown-content");
-        for (let i = 0; i < dropdowns.length; i++) {
-            dropdowns[i].style.display = "none";
-        }
-    }
-};
+            if (!event.target.matches('.profile-icon') && !event.target.closest('.dropdown-content')) {
+                const dropdowns = document.getElementsByClassName("dropdown-content");
+                for (let i = 0; i < dropdowns.length; i++) {
+                    dropdowns[i].style.display = "none";
+                }
+            }
+        };
 
-// Add event listeners to both dropbtn and dropdown-content
-const dropbtn = document.querySelector('.dropbtn');
-const dropdownContent = document.querySelector('.dropdown-content');
+        // Add event listeners to both dropbtn and dropdown-content
+        const dropbtn = document.querySelector('.dropbtn');
+        const dropdownContent = document.querySelector('.dropdown-content');
 
-let dropdownTimeout;
+        let dropdownTimeout;
 
-dropbtn.addEventListener('mouseenter', function() {
-    clearTimeout(dropdownTimeout);
-    dropdownContent.style.display = "block";
-});
+        dropbtn.addEventListener('mouseenter', function() {
+            clearTimeout(dropdownTimeout);
+            dropdownContent.style.display = "block";
+        });
 
-dropbtn.addEventListener('mouseleave', function() {
-    // Start timeout when leaving dropbtn
-    dropdownTimeout = setTimeout(() => {
-        dropdownContent.style.display = "none";
-    }, 100); // 100ms delay to allow moving to dropdown
-});
+        dropbtn.addEventListener('mouseleave', function() {
+            // Start timeout when leaving dropbtn
+            dropdownTimeout = setTimeout(() => {
+                dropdownContent.style.display = "none";
+            }, 100); // 100ms delay to allow moving to dropdown
+        });
 
-dropdownContent.addEventListener('mouseenter', function() {
-    clearTimeout(dropdownTimeout);
-    dropdownContent.style.display = "block";
-});
+        dropdownContent.addEventListener('mouseenter', function() {
+            clearTimeout(dropdownTimeout);
+            dropdownContent.style.display = "block";
+        });
 
-dropdownContent.addEventListener('mouseleave', function() {
-    dropdownContent.style.display = "none";
-});
+        dropdownContent.addEventListener('mouseleave', function() {
+            dropdownContent.style.display = "none";
+        });
 
-    function createVideoItem(video, folderContent) {
-        const videoItem = document.createElement('div');
-        videoItem.className = 'video-item';
+        function createVideoItem(video, folderContent) {
+            const videoItem = document.createElement('div');
+            videoItem.className = 'video-item';
 
-        const videoPlayerContainer = document.createElement('div');
-        videoPlayerContainer.style.position = 'relative';
-        videoPlayerContainer.style.paddingTop = '100%'; // 16:9 aspect ratio is 56.25
-        
+            const videoPlayerContainer = document.createElement('div');
+            videoPlayerContainer.style.position = 'relative';
+            videoPlayerContainer.style.paddingTop = '100%'; // 16:9 aspect ratio is 56.25
+            
+            const videoPlayer = document.createElement('iframe');
+            videoPlayer.src = `https://iframe.cloudflarestream.com/${video._id}`;
+            videoPlayer.style.border = 'none';
+            videoPlayer.style.position = 'absolute';
+            videoPlayer.style.top = '0';
+            videoPlayer.style.height = '100%';
+            videoPlayer.style.width = '100%';
+            videoPlayer.className = 'responsive-video';
+            videoPlayer.allow = 'autoplay; fullscreen;';
+            videoPlayer.allowFullscreen = true;
 
-        const videoPlayer = document.createElement('iframe');
+            videoPlayerContainer.appendChild(videoPlayer);
+            
+            const title = document.createElement('h3');
+            title.className = 'video-title';
+            title.innerText = video.metadata.title;
 
-       
+            const subject = document.createElement('p');
+            subject.className = 'video-subject';
+            subject.innerText = video.metadata.subject;
 
-        videoPlayer.src = `https://iframe.cloudflarestream.com/${video._id}`;
-        videoPlayer.style.border = 'none';
-        videoPlayer.style.position = 'absolute';
-        videoPlayer.style.top = '0';
-        videoPlayer.style.height = '100%';
-        videoPlayer.style.width = '100%';
-        videoPlayer.className = 'responsive-video';
-        videoPlayer.allow = 'autoplay; fullscreen;';
-        videoPlayer.allowFullscreen = true;
+            const date = document.createElement('p');
+            date.className = 'video-date';
+            date.innerText = new Date(video.metadata.createdAt).toLocaleDateString();
 
-        videoPlayerContainer.appendChild(videoPlayer);
-        
+            const deleteButton = document.createElement('button');
+            deleteButton.className = 'delete-button';
+            deleteButton.innerText = 'Delete';
+            deleteButton.onclick = () => deleteVideo(video._id);
 
-        const title = document.createElement('h3');
-        title.className = 'video-title';
-        title.innerText = video.metadata.title;
+            videoItem.appendChild(videoPlayerContainer);
+            videoItem.appendChild(title);
+            videoItem.appendChild(subject);
+            videoItem.appendChild(deleteButton);
 
-        const subject = document.createElement('p');
-        subject.className = 'video-subject';
-        subject.innerText = video.metadata.subject;
-
-        const date = document.createElement('p');
-        date.className = 'video-date';
-        date.innerText = new Date(video.metadata.createdAt).toLocaleDateString();
-
-        const deleteButton = document.createElement('button');
-        deleteButton.className = 'delete-button';
-        deleteButton.innerText = 'Delete';
-        deleteButton.onclick = () => deleteVideo(video._id);
-
-        videoItem.appendChild(videoPlayerContainer);
-        videoItem.appendChild(title);
-        videoItem.appendChild(subject);
-        videoItem.appendChild(deleteButton);
-
-        folderContent.appendChild(videoItem);
-
+            folderContent.appendChild(videoItem);
         }
 
         function filterAndDisplayVideos(videos, folderContent, searchTerm = '') {
@@ -230,11 +224,20 @@ dropdownContent.addEventListener('mouseleave', function() {
                 })
                 .then(videos => {
                     const videoCard = document.getElementById('videoCard');
-                    videos.reverse();
+                    const videoArray = [];
+
+                    // Extract videos from the grouped response
+                    for (const classCode in videos) {
+                        for (const userEmail in videos[classCode]) {
+                            videoArray.push(...videos[classCode][userEmail]);
+                        }
+                    }
+
+                    videoArray.reverse(); // Now we can safely reverse the array
 
                     // Group videos by class code
                     const groupedVideos = {};
-                    videos.forEach(video => {
+                    videoArray.forEach(video => {
                         const classCode = video.metadata.classCode;
                         if (!groupedVideos[classCode]) {
                             groupedVideos[classCode] = [];
