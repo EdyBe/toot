@@ -246,11 +246,13 @@ dropdownContent.addEventListener('mouseleave', function() {
                         videoArray = []; // Fallback to an empty array
                     }
 
+                    console.log('Extracted videoArray:', videoArray);
                     videoArray.reverse(); // Now we can safely reverse the array
 
+                    console.log('Extracted videoArray:', videoArray);
                     // Group videos by class code
                     const groupedVideos = {};
-                    videos.forEach(video => {
+                    videoArray.forEach(video => {
                         const classCode = video.metadata.classCode;
                         if (!groupedVideos[classCode]) {
                             groupedVideos[classCode] = [];
