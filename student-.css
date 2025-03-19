@@ -115,11 +115,7 @@ body {
 }
 
 
-.video-item video {
-    width: 150px; /* Set width */
-    height: 150px; /* Set height to match width for square */
-    object-fit: cover; /* Ensure the video covers the area without distortion */
-}
+
 
 header {
     display: flex;
@@ -257,24 +253,13 @@ p{
     margin: 0 auto;
 }
 
-.responsive-video {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    transform: scale(0.8);
-    transform-origin: top left;
-}
+
 
 .video-player-container {
     overflow: hidden;
 }
 
-.video-item {
-    width: 100%;
-    margin: 10px auto;
-}
+
 
 /* Media queries for different screen sizes */
 @media (max-width: 768px) {
