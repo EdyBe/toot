@@ -1,5 +1,5 @@
 // Initialize Supabase client
-import { createClient } from 'https://esm.sh/@supabase/supabase-js'
+const { createClient } = require('@supabase/supabase-js'); // Import Supabase client
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
@@ -256,3 +256,6 @@ async function storeVideoMetadata(videoData) {
 
 // Export functions
 module.exports = { createUser, readUser, updateUser, deleteUser, uploadVideo, storeVideoMetadata };
+
+
+
