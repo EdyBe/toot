@@ -179,13 +179,11 @@
 
         // Back button functionality
         document.getElementById('backButton').addEventListener('click', function() {
-            const referrer = document.referrer;
-            if (referrer.includes('teacher.html')) {
-                window.location.href = 'teacher.html';
-            } else if (referrer.includes('student.html')) {
-                window.location.href = 'student.html';
+            const referrer = document.referrer; // Get the referrer URL
+            if (referrer) {
+                window.location.href = referrer; // Redirect to the referrer page
             } else {
-                window.history.back(); // Fallback to the default back behavior
+                window.location.href = 'index.html'; // Default fallback page
             }
         });
     </script>
