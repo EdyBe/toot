@@ -52,11 +52,13 @@
         // Fetch user information when the page loads
         window.onload = async function() {
             const email = sessionStorage.getItem('userEmail'); // Get the email from sessionStorage
+            console.log('Email retrieved from session storage:', email); // Debug log
 
             if (!email) {
                 console.error('User not authenticated.');
                 return;
             }
+            console.log('Fetching user info for email:', email); // Debug log
 
             try {
                 // Fetch user data using the /user-info endpoint
@@ -229,3 +231,4 @@
     </style>
 </body>
 </html>
+
