@@ -230,7 +230,23 @@ dropdownContent.addEventListener('mouseleave', function() {
                 })
                 .then(videos => {
                     const videoCard = document.getElementById('videoCard');
-                    videos.reverse();
+                    let videoArray = [];
+                    console.log('Sending grouped videos:', videos);
+                    
+                    // Extract videos from the grouped response
+                    for (const classCode in videos) {
+                        for (const userEmail in videos[classCode]) {
+                            videoArray.push(...videos[classCode][userEmail]);
+                        }
+                    }
+                    
+                    // Check if videoArray is an array
+                    if (!Array.isArray(videoArray)) {
+                        console.error('Expected videoArray to be an array, but got:', videoArray);
+                        videoArray = []; // Fallback to an empty array
+                    }
+
+                    videoArray.reverse(); // Now we can safely reverse the array
 
                     // Group videos by class code
                     const groupedVideos = {};
