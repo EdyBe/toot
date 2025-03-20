@@ -63,6 +63,9 @@
             try {
                 // Fetch user data using the /user-info endpoint
                 const response = await fetch(`/user-info?email=${encodeURIComponent(email)}`);
+                console.log('Response from user-info:', response); // Log the response
+    
+                console.log('Fetched user data:', data); // Log the fetched data
                 if (!response.ok) {
                     throw new Error('Failed to fetch user info');
                 }
