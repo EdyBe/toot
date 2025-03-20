@@ -225,18 +225,26 @@ p{
     font-family: Arial;
 }
 
+
+
+/* Style the iframe to fit within the container */
 .responsive-video {
     position: absolute;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
+    border: none;
+    object-fit: cover; /* Ensure the video fits properly */
 }
 
-/* Removed the scale transformation from the controls class */
-.responsive-video.controls {
-    /* transform: scale(0.8); */
+/* Optional: Add padding or margins to prevent controls from being cut off */
+.video-item {
+    padding: 10px;
+    box-sizing: border-box;
 }
+
+
 
 /* Media queries for different screen sizes */
 @media (max-width: 768px) {
