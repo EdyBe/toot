@@ -115,11 +115,6 @@ body {
 }
 
 
-.video-item video {
-    width: 150px; /* Set width */
-    height: 150px; /* Set height to match width for square */
-    object-fit: cover; /* Ensure the video covers the area without distortion */
-}
 
 header {
     display: flex;
