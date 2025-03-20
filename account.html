@@ -63,14 +63,14 @@
             try {
                 // Fetch user data using the /user-info endpoint
                 const response = await fetch(`/user-info?email=${encodeURIComponent(email)}`);
-                console.log('Response from user-info:', response); // Log the response
-    
-                console.log('Fetched user data:', data); // Log the fetched data
+                
                 if (!response.ok) {
+                    console.error('Failed to fetch user info:', response.statusText); // Log the response status
                     throw new Error('Failed to fetch user info');
                 }
-                
+
                 const data = await response.json();
+                console.log('Fetched user data:', data); // Log the fetched data
                 document.getElementById('user-name').innerText = `Name: ${data.firstName}`;
                 document.getElementById('class-codes').innerText = `Class Codes: ${data.classCodes.join(", ")}`;
                 document.getElementById('school-name').innerText = `School: ${data.schoolName}`;
@@ -232,4 +232,3 @@
     </style>
 </body>
 </html>
-
