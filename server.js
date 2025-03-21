@@ -804,6 +804,117 @@ app.post('/videos/view', async (req, res) => {
     }
 });
 
+
+/**
+ * Updates user's class codes by adding or removing a code
+ * @param {string} email - User's email address
+ * @param {Object} options - Contains classCode to add/remove
+ * @param {string} action - 'add' or 'delete' operation
+ * @returns {Promise<Object>} Success message
+ * @throws {Error} If user not found or operation fails
+ */
+async function updateUser(email, { classCode }, action) {
+    const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('email', email)
+        .single();
+
+    if (error) {
+        throw new Error('User not found: ' + error.message);
+    }
+
+    if (action === 'add') {
+        // Add new class code to user's array
+        const { error: updateError } = await supabase
+            .from('users')
+            .update({ classCodesArray: [...data.classCodesArray, classCode] })
+            .eq('email', email);
+
+        if (updateError) {
+            throw new Error('No changes made while adding class code: ' + updateError.message);
+        }
+    } else if (action === 'delete') {
+        // Verify class code exists before removal
+        if (!data.classCodesArray.includes(classCode)) {
+            throw new Error('Class code does not exist');
+        }
+
+        const { error: deleteError } = await supabase
+            .from('users')
+            .update({ classCodesArray: data.classCodesArray.filter(code => code !== classCode) })
+            .eq('email', email);
+
+        if (deleteError) {
+            throw new Error('No changes made while deleting class code: ' + deleteError.message);
+        }
+    } else {
+        throw new Error('Invalid action. Use "add" or "delete".');
+    }
+
+    return { message: `Class code ${action === 'add' ? 'added' : 'deleted'} successfully!` };
+}
+
+/**
+ * Deletes a user and optionally their associated videos
+ * @param {string} email - User's email address
+ * @returns {Promise<Object>} Delete operation result
+ * @throws {Error} If user is not found
+ */
+async function deleteUser(email) {
+    const { data, error } = await supabase
+        .from('users')
+        .delete()
+        .eq('email', email);
+
+    if (error) {
+        throw new Error('User not found: ' + error.message);
+    }
+
+    // Clean up associated videos
+    await cloudflareStream.deleteVideos({ userEmail: email });
+
+    return data;
+}
+
+/**
+ * Uploads a video to Cloudflare Stream with associated metadata
+ * @param {Object} videoData - Video information including buffer, metadata, and user details
+ * @returns {Promise<Object>} Upload result containing file ID and metadata
+ * @throws {Error} If upload fails
+ */
+async function uploadVideo(videoData) {
+    try {
+        const uploadResult = await cloudflareStream.upload(videoData.buffer, {
+            metadata: {
+                title: videoData.title,
+                subject: videoData.subject,
+                userId: videoData.userId,
+                userEmail: videoData.userEmail,
+                classCode: videoData.classCode,
+                contentType: videoData.mimetype,
+                schoolName: videoData.schoolName
+            }
+        });
+
+        // Store video metadata in Supabase
+        await storeVideoMetadata({
+            videoId: uploadResult.id,
+            schoolName: videoData.schoolName,
+            classCode: videoData.classCode,
+            title: videoData.title,
+            subject: videoData.subject,
+            userId: videoData.userId, // Include user ID here
+            firstName: videoData.firstName
+        });
+
+        return uploadResult;
+    } catch (error) {
+        throw new Error('Failed to upload video: ' + error.message);
+    }
+}
+
+
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
