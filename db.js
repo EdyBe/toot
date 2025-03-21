@@ -1,7 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
+import { supabase } from './server.js';
 // License Key Management System
 const licenseKeyLimits = {
     "BurnsideHighSchool": 4,
@@ -252,7 +249,11 @@ async function storeVideoMetadata(videoData) {
 }
 
 
-// Export functions
-export { createUser, readUser, updateUser, deleteUser, uploadVideo, storeVideoMetadata };
-
-
+module.exports = {
+    createUser,
+    readUser,
+    updateUser,
+    deleteUser,
+    uploadVideo,
+    storeVideoMetadata
+};
