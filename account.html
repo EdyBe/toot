@@ -47,7 +47,10 @@
     </div>
 
 <script>
+        // Database related imports
+const { uploadVideo, createUser, updateUser, readUser } = require('./db.js'); // Import functions from db.js
 
+    
         // Fetch user information when the page loads
         window.onload = async function() {
             const email = sessionStorage.getItem('userEmail'); // Get the email from sessionStorage
