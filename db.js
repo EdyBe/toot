@@ -1,4 +1,7 @@
-import { supabase } from './server.js';
+import { createClient } from '@supabase/supabase-js';
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
 // License Key Management System
 const licenseKeyLimits = {
     "BurnsideHighSchool": 4,
