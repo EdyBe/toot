@@ -1,7 +1,5 @@
-import { createClient } from '@supabase/supabase-js'; // Import Supabase client
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
+import { supabase } from './server.js'; // Import existing Supabase client
+
 
 // License Key Management System
 const licenseKeyLimits = {
