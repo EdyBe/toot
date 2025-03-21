@@ -1,4 +1,4 @@
-const { supabase } = require('./server'); // Import existing Supabase client
+const { supabase } = require('./server.js'); // Import existing Supabase client
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
