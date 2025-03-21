@@ -1,4 +1,4 @@
-import { supabase } from './supabaseClient.js';
+import { supabase } from './server.js';
 // License Key Management System
 const licenseKeyLimits = {
     "BurnsideHighSchool": 4,
