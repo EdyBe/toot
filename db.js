@@ -1,3 +1,4 @@
+// Initialize Supabase client
 import { createClient } from '@supabase/supabase-js'; // Import Supabase client
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
