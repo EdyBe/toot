@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js'; // Import Supabase client
+const { supabase } = require('./server'); // Import existing Supabase client
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
@@ -25,14 +25,13 @@ const validLicenseKeys = {
  * @throws {Error} If user creation fails
  */
 async function createUser(userData) {
-    // Check for existing user with the same email
     const { data: existingUser, error: emailCheckError } = await supabase
         .from('users')
         .select('*')
         .eq('email', userData.email)
         .single();
 
-    if (emailCheckError && emailCheckError.code !== 'PGRST116') { // PGRST116 indicates no rows found
+    if (emailCheckError && emailCheckError.code !== 'PGRST116') {
         throw new Error('Error checking email uniqueness: ' + emailCheckError.message);
     }
 
@@ -40,7 +39,6 @@ async function createUser(userData) {
         throw new Error('Email already in use');
     }
 
-    // Validate license key for account type
     if (!validLicenseKeys[userData.accountType].includes(userData.licenseKey)) {
         throw new Error('Invalid license key for the selected account type.');
     }
@@ -64,7 +62,6 @@ async function createUser(userData) {
  */
 async function readUser(email) {
     try {
-        console.log('Fetching user data for:', email);
         const { data, error } = await supabase
             .from('users')
             .select('*')
@@ -72,30 +69,21 @@ async function readUser(email) {
             .single();
 
         if (error) {
-            console.error('Error fetching user:', error);
             throw new Error('User not found: ' + error.message);
         }
 
-        console.log('Retrieved user data:', data);
-
         let videosData = [];
         if (data.accountType === 'student') {
-            console.log('Fetching student videos for user:', data.id);
             const { data: studentVideos, error: studentVideosError } = await supabase
                 .from('videos')
                 .select('*')
                 .eq('user_id', data.id);
 
             if (studentVideosError) {
-                console.error('Error fetching student videos:', studentVideosError);
                 throw new Error('Error fetching student videos: ' + studentVideosError.message);
             }
             videosData = studentVideos;
         } else if (data.accountType === 'teacher') {
-            console.log('Fetching teacher videos for:', {
-                schoolName: data.school_name,
-                classCodes: data.classCodesArray
-            });
             const { data: teacherVideos, error: teacherVideosError } = await supabase
                 .from('videos')
                 .select('*')
@@ -103,13 +91,10 @@ async function readUser(email) {
                 .in('class_code', data.classCodesArray);
 
             if (teacherVideosError) {
-                console.error('Error fetching teacher videos:', teacherVideosError);
                 throw new Error('Error fetching teacher videos: ' + teacherVideosError.message);
             }
             videosData = teacherVideos;
         }
-
-        console.log('Retrieved videos:', videosData);
 
         const videos = videosData.map(video => ({
             videoUid: video.video_id,
@@ -118,7 +103,6 @@ async function readUser(email) {
 
         return { user: data, videos };
     } catch (error) {
-        console.error('Error in readUser:', error);
         throw error;
     }
 }
@@ -143,7 +127,6 @@ async function updateUser(email, { classCode }, action) {
     }
 
     if (action === 'add') {
-        // Add new class code to user's array
         const { error: updateError } = await supabase
             .from('users')
             .update({ classCodesArray: [...data.classCodesArray, classCode] })
@@ -153,7 +136,6 @@ async function updateUser(email, { classCode }, action) {
             throw new Error('No changes made while adding class code: ' + updateError.message);
         }
     } else if (action === 'delete') {
-        // Verify class code exists before removal
         if (!data.classCodesArray.includes(classCode)) {
             throw new Error('Class code does not exist');
         }
@@ -189,9 +171,6 @@ async function deleteUser(email) {
         throw new Error('User not found: ' + error.message);
     }
 
-    // Clean up associated videos
-    await cloudflareStream.deleteVideos({ userEmail: email });
-
     return data;
 }
 
@@ -215,14 +194,13 @@ async function uploadVideo(videoData) {
             }
         });
 
-        // Store video metadata in Supabase
         await storeVideoMetadata({
             videoId: uploadResult.id,
             schoolName: videoData.schoolName,
             classCode: videoData.classCode,
             title: videoData.title,
             subject: videoData.subject,
-            userId: videoData.userId, // Include user ID here
+            userId: videoData.userId,
             firstName: videoData.firstName
         });
 
@@ -242,7 +220,7 @@ async function storeVideoMetadata(videoData) {
             class_code: videoData.classCode,
             title: videoData.title,
             subject: videoData.subject,
-            user_id: videoData.userId // Include user ID here
+            user_id: videoData.userId
         }]);
 
     if (error) {
@@ -252,9 +230,12 @@ async function storeVideoMetadata(videoData) {
     return data[0];
 }
 
-
-// Export functions
-export { createUser, readUser, updateUser, deleteUser, uploadVideo, storeVideoMetadata };
-
-
-
+// Export functions using CommonJS syntax
+module.exports = {
+    createUser,
+    readUser,
+    updateUser,
+    deleteUser,
+    uploadVideo,
+    storeVideoMetadata
+};
