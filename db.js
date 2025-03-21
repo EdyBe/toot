@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js'; // Import Supabase client
+const { createClient } = require('@supabase/supabase-js'); // Import Supabase client
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
@@ -231,7 +231,7 @@ async function storeVideoMetadata(videoData) {
 }
 
 // Export functions using CommonJS syntax
-export {
+module.exports = {
     createUser,
     readUser,
     updateUser,
