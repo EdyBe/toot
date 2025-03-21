@@ -231,7 +231,7 @@ async function storeVideoMetadata(videoData) {
 }
 
 // Export functions using CommonJS syntax
-module.exports = {
+export {
     createUser,
     readUser,
     updateUser,
