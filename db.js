@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js'; // Import Supabase client
+import { createClient } from './node_modules/@supabase/supabase-js/dist/main.js';
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
