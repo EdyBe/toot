@@ -1,38 +1,40 @@
-import dotenv from 'dotenv'; // Load environment variables from .env file
-import express from 'express'; // Express framework for handling HTTP requests
-import cors from 'cors'; // CORS middleware for cross-origin requests
-import { 
+// Server Configuration and Initialization
+require('dotenv').config(); // Load environment variables from .env file
+const express = require('express'); // Express framework for handling HTTP requests
+const cors = require('cors'); // CORS middleware for cross-origin requests
+const { 
     sendPasswordResetEmail, 
     generateResetToken, 
     storeResetToken, 
     validateResetToken, 
     deleteResetToken 
-} from './emailService.js'; // Email service functions for password reset
-import multer from 'multer'; // Middleware for handling file uploads
-import { Server } from '@tus/server'; // Import TUS server
-import { FileStore } from '@tus/file-store'; // Import FileStore for TUS
-import fs from 'fs';
-import axios from 'axios'; // Import Axios for making HTTP requests
-import { createClient } from '@supabase/supabase-js'; // Import Supabase client
-import path from 'path'; // Path module for file path operations
-import bodyParser from 'body-parser';
-import tus from 'tus-js-client';
-import { PassThrough } from 'stream'; // Import stream module
+} = require('./emailService'); // Email service functions for password reset
+const multer = require('multer'); // Middleware for handling file uploads
+const { Server } = require('@tus/server'); // Import TUS server
+const { FileStore } = require('@tus/file-store'); // Import FileStore for TUS
+const fs = require('fs');
+const axios = require('axios'); // Import Axios for making HTTP requests
+const { createClient } = require('@supabase/supabase-js'); // Import Supabase client
+const path = require('path'); // Path module for file path operations
+const bodyParser = require('body-parser');
+const tus = require('tus-js-client');
+const { PassThrough } = require('stream'); // Import stream module
 
-// Server Configuration and Initialization
-dotenv.config(); 
+
 
 // Configure multer storage
 const storage = multer.memoryStorage();
 const uploadMiddleware = multer({ storage: storage });
+
 
 // Initialize Supabase client
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_KEY;
 const supabase = createClient(supabaseUrl, supabaseKey);
 
+
 // Database related imports
-import { uploadVideo, createUser, updateUser, readUser } from './db.js'; // Import functions from db.js
+const { uploadVideo, createUser, updateUser, readUser } = require('./db.js'); // Import functions from db.js
 
 // Initialize Express application
 const app = express();
@@ -46,8 +48,10 @@ app.use(cors({
     optionsSuccessStatus: 204
 }));
 
+
+
 // Security and database modules
-import bcrypt from 'bcrypt'; // For password hashing
+const bcrypt = require('bcrypt'); // For password hashing
 
 // Application Configuration
 const validSchoolNames = ["Burnside", "STAC", "School C", "Christ The King", "Test School"]; // List of valid school names
@@ -74,6 +78,13 @@ const upload = multer({
     }
 });
 
+
+
+
+////
+
+
+////
 
 const cloudflareStreamId = process.env.CLOUDFLARE_STREAM_ID;
 
@@ -571,11 +582,11 @@ app.get('/user-info', async (req, res) => {
 
 
 // Serve static files from the current directory
-app.use(express.static(path.resolve())); // Use path.resolve() for compatibility
+app.use(express.static(__dirname));
 
 // Set up a route for the root URL
 app.get('/', (req, res) => {
-    res.sendFile(path.join(path.resolve(), 'sign-in.html')); // Adjust the path if your index.html is in a different directory
+    res.sendFile(path.join(__dirname, 'sign-in.html')); // Adjust the path if your index.html is in a different directory
 });
 
 /**
@@ -796,5 +807,3 @@ app.post('/videos/view', async (req, res) => {
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);
 });
-
-
