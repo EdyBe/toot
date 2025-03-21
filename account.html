@@ -46,6 +46,119 @@
         </div>
     </div>
 
+<script>
+async function readUser(email) {
+    try {
+        console.log('Fetching user data for:', email);
+        const { data, error } = await supabase
+            .from('users')
+            .select('*')
+            .eq('email', email)
+            .single();
+
+        if (error) {
+            console.error('Error fetching user:', error);
+            throw new Error('User not found: ' + error.message);
+        }
+
+        console.log('Retrieved user data:', data);
+
+        let videosData = [];
+        if (data.accountType === 'student') {
+            console.log('Fetching student videos for user:', data.id);
+            const { data: studentVideos, error: studentVideosError } = await supabase
+                .from('videos')
+                .select('*')
+                .eq('user_id', data.id);
+
+            if (studentVideosError) {
+                console.error('Error fetching student videos:', studentVideosError);
+                throw new Error('Error fetching student videos: ' + studentVideosError.message);
+            }
+            videosData = studentVideos;
+        } else if (data.accountType === 'teacher') {
+            console.log('Fetching teacher videos for:', {
+                schoolName: data.school_name,
+                classCodes: data.classCodesArray
+            });
+            const { data: teacherVideos, error: teacherVideosError } = await supabase
+                .from('videos')
+                .select('*')
+                .eq('school_name', data.school_name)
+                .in('class_code', data.classCodesArray);
+
+            if (teacherVideosError) {
+                console.error('Error fetching teacher videos:', teacherVideosError);
+                throw new Error('Error fetching teacher videos: ' + teacherVideosError.message);
+            }
+            videosData = teacherVideos;
+        }
+
+        console.log('Retrieved videos:', videosData);
+
+        const videos = videosData.map(video => ({
+            videoUid: video.video_id,
+            accountId: process.env.CLOUDFLARE_ACCOUNT_ID
+        }));
+
+        return { user: data, videos };
+    } catch (error) {
+        console.error('Error in readUser:', error);
+        throw error;
+    }
+}
+
+/**
+ * Updates user's class codes by adding or removing a code
+ * @param {string} email - User's email address
+ * @param {Object} options - Contains classCode to add/remove
+ * @param {string} action - 'add' or 'delete' operation
+ * @returns {Promise<Object>} Success message
+ * @throws {Error} If user not found or operation fails
+ */
+async function updateUser(email, { classCode }, action) {
+    const { data, error } = await supabase
+        .from('users')
+        .select('*')
+        .eq('email', email)
+        .single();
+
+    if (error) {
+        throw new Error('User not found: ' + error.message);
+    }
+
+    if (action === 'add') {
+        // Add new class code to user's array
+        const { error: updateError } = await supabase
+            .from('users')
+            .update({ classCodesArray: [...data.classCodesArray, classCode] })
+            .eq('email', email);
+
+        if (updateError) {
+            throw new Error('No changes made while adding class code: ' + updateError.message);
+        }
+    } else if (action === 'delete') {
+        // Verify class code exists before removal
+        if (!data.classCodesArray.includes(classCode)) {
+            throw new Error('Class code does not exist');
+        }
+
+        const { error: deleteError } = await supabase
+            .from('users')
+            .update({ classCodesArray: data.classCodesArray.filter(code => code !== classCode) })
+            .eq('email', email);
+
+        if (deleteError) {
+            throw new Error('No changes made while deleting class code: ' + deleteError.message);
+        }
+    } else {
+        throw new Error('Invalid action. Use "add" or "delete".');
+    }
+
+    return { message: `Class code ${action === 'add' ? 'added' : 'deleted'} successfully!` };
+}
+</script>
+    
     <script>
         // Fetch user information when the page loads
         window.onload = async function() {
