@@ -71,9 +71,9 @@
 
                 const data = await response.json();
                 console.log('Fetched user data:', data); // Log the fetched data
-                document.getElementById('user-name').innerText = `Name: ${data.firstName}`;
-                document.getElementById('class-codes').innerText = `Class Codes: ${data.classCodes.join(", ")}`;
-                document.getElementById('school-name').innerText = `School: ${data.schoolName}`;
+                document.getElementById("user-name").innerText = `Name: ${data.firstName}`;
+                document.getElementById("class-codes").innerText = `Class Codes: ${data.classCodes.join(", ")}`;
+                document.getElementById("school-name").innerText = `School: ${data.schoolName}`;
             } catch (error) {
                 console.error('Error fetching user info:', error.message);
                 document.getElementById('error-message').innerText = 'Failed to load user information';
