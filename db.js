@@ -1,5 +1,3 @@
-import { supabase } from './server.js'; // Import the initialized Supabase client
-
 // License Key Management System
 const licenseKeyLimits = {
     "BurnsideHighSchool": 4,
