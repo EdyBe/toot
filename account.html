@@ -47,6 +47,10 @@
     </div>
 
 <script>
+    import { createClient } from '@supabase/supabase-js';
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseKey = process.env.SUPABASE_KEY;
+const supabase = createClient(supabaseUrl, supabaseKey);
 async function readUser(email) {
     try {
         console.log('Fetching user data for:', email);
