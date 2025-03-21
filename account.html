@@ -161,9 +161,7 @@ async function updateUser(email, { classCode }, action) {
 
     return { message: `Class code ${action === 'add' ? 'added' : 'deleted'} successfully!` };
 }
-</script>
-    
-    <script>
+
         // Fetch user information when the page loads
         window.onload = async function() {
             const email = sessionStorage.getItem('userEmail'); // Get the email from sessionStorage
