@@ -34,7 +34,7 @@ const supabase = createClient(supabaseUrl, supabaseKey);
 
 
 // Database related imports
-const { uploadVideo, createUser, updateUser, readUser } = require('./db');
+const { uploadVideo, createUser, updateUser, readUser } = require('./db.js'); // Import functions from db.js
 
 // Initialize Express application
 const app = express();
