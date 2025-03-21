@@ -252,12 +252,7 @@ async function storeVideoMetadata(videoData) {
 }
 
 
-export = {
-    createUser,
-    readUser,
-    updateUser,
-    deleteUser,
-    uploadVideo,
-    storeVideoMetadata
-};
+// Export functions
+ 
 
+export { createUser, readUser, updateUser, deleteUser, uploadVideo, storeVideoMetadata };
