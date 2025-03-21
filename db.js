@@ -1,4 +1,4 @@
-import { supabase } from './server.js'; // Import existing Supabase client
+import { supabase } from './supabaseClient.js'; // Import Supabase client
 
 
 // License Key Management System
