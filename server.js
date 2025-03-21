@@ -336,8 +336,7 @@ app.post('/upload', uploadMiddleware.single('video'), async (req, res) => {
                                 subject: subject,
                                 school_name: userData.schoolName,
                                 hls_manifest_url: videoDetails.playback.hls,
-                                dash_manifest_url: videoDetails.playback.dash,
-                                firstName: userData.firstName
+                                dash_manifest_url: videoDetails.playback.dash
                             },
                         ]);
 
@@ -517,6 +516,21 @@ app.get('/class-codes', async (req, res) => {
     }
 });
 
+
+
+
+
+
+
+/////
+
+
+
+
+
+
+
+
 // TUS Server Configuration
 const tusServer = new Server({
     path: '/files', // TUS endpoint
@@ -532,7 +546,32 @@ const tusServer = new Server({
 // Middleware to handle TUS uploads
 app.use('/files', tusServer.handle.bind(tusServer));
 
+// Existing user info retrieval endpoint
+app.get('/user-info', async (req, res) => {
+    try {
+        const email = req.query.email;
+        if (!email) {
+            return res.status(400).json({ message: 'Email is required' });
+        }
 
+        const { user, videos } = await readUser(email);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Capitalize first name for display
+        const capitalizedFirstName = user.firstName.charAt(0).toUpperCase() + user.firstName.slice(1);
+        
+        res.json({
+            firstName: capitalizedFirstName,
+            classCodes: user.classCodesArray,
+            schoolName: user.schoolName
+        });
+    } catch (error) {
+        console.error('Error fetching user info:', error);
+        res.status(500).json({ message: 'Failed to fetch user info' });
+    }
+});
 
 /**
  * Retrieves user information including first name, class codes, and school name
@@ -546,26 +585,19 @@ app.get('/user-info', async (req, res) => {
             return res.status(400).json({ message: 'Email is required' });
         }
 
-        console.log('Fetching user info for:', email);
         const { user, videos } = await readUser(email);
         if (!user) {
-            console.error('User not found in database:', email);
             return res.status(404).json({ message: 'User not found' });
         }
 
-        console.log('Retrieved user:', user);
-        
         // Capitalize first name for display
         const capitalizedFirstName = user.firstName.charAt(0).toUpperCase() + user.firstName.slice(1);
         
-        const responseData = {
+        res.json({
             firstName: capitalizedFirstName,
             classCodes: user.classCodesArray,
             schoolName: user.schoolName
-        };
-        
-        console.log('Sending user info:', responseData);
-        res.json(responseData);
+        });
     } catch (error) {
         console.error('Error fetching user info:', error);
         res.status(500).json({ message: 'Failed to fetch user info' });
@@ -692,7 +724,7 @@ app.post('/api/reset-password', async (req, res) => {
     }
 });
 
-// Endpoint to fetch videos for a user (GET)
+// Endpoint to fetch videos for a user
 app.get('/videos', async (req, res) => {
     try {
         const email = req.query.email;
@@ -700,86 +732,35 @@ app.get('/videos', async (req, res) => {
             return res.status(400).json({ message: 'Email is required' });
         }
 
-        // Get user details to determine account type
-        console.log('Fetching videos for:', email);
-        
-        const { data: user, error: userError } = await supabase
-            .from('users')
-            .select('accountType, schoolName, classCodesArray')
-            .eq('email', email)
-            .single();
-
-        if (userError || !user) {
-            console.error('Error fetching user:', userError || 'User not found');
-            throw userError || new Error('User not found');
-        }
-
-        console.log('Retrieved user data:', user);
-
-        let query = supabase
+        // Get videos associated with the user's email
+        const { data: videos, error } = await supabase
             .from('videos')
-            .select('*');
-
-        if (user.accountType === 'teacher') {
-            console.log('Filtering videos for teacher:', {
-                schoolName: user.schoolName,
-                classCodes: user.classCodesArray
-            });
-            query = query
-                .eq('school_name', user.schoolName)
-                .in('class_code', user.classCodesArray);
-        } else {
-            console.log('Filtering videos for student by email:', email);
-            query = query.eq('user_email', email);
-        }
-
-        const { data: videos, error } = await query;
+            .select('*')
+            .eq('user_email', email);
 
         if (error) {
-            console.error('Error fetching videos:', error);
             throw error;
         }
 
-        console.log('Retrieved videos:', videos);
-
-        // Group videos by user email
-        const groupedVideos = {};
-        videos.forEach(video => {
-            const classCode = video.class_code || 'Unknown Class';
-            const userEmail = video.user_email;
-            const firstName = video.firstName || userEmail.split('@')[0];
-            
-            if (!groupedVideos[classCode]) {
-                groupedVideos[classCode] = {};
+        // Format videos for frontend
+        const formattedVideos = videos.map(video => ({
+            _id: video.video_id,
+            metadata: {
+                title: video.title,
+                subject: video.subject,
+                classCode: video.class_code,
+                createdAt: video.created_at,
+                hlsUrl: video.hls_manifest_url,
+                dashUrl: video.dash_manifest_url
             }
-            if (!groupedVideos[classCode][firstName]) {
-                groupedVideos[classCode][firstName] = [];
-            }
-            
-            groupedVideos[classCode][firstName].push({
-                _id: video.video_id,
-                metadata: {
-                    title: video.title,
-                    subject: video.subject,
-                    classCode: video.class_code,
-                    createdAt: video.created_at,
-                    hlsUrl: video.hls_manifest_url,
-                    dashUrl: video.dash_manifest_url,
-                    userEmail: video.user_email,
-                    firstName: video.firstName
-                }
-            });
-        });
+        }));
 
-        console.log('Sending grouped videos:', groupedVideos);
-        res.json(groupedVideos);
+        res.json(formattedVideos);
     } catch (error) {
         console.error('Error fetching videos:', error);
         res.status(500).json({ message: 'Failed to fetch videos' });
     }
 });
-
-
 
 // Video Viewing Functionality
 app.post('/videos/view', async (req, res) => {
