@@ -96,7 +96,8 @@ dropdownContent.addEventListener('mouseleave', function() {
 });
 
     function createVideoItem(video, folderContent) {
-        const videoItem = document.createElement('div');
+console.log("Video object:", video); // Debug log to inspect the video object
+const videoItem = document.createElement('div');
         videoItem.className = 'video-item';
 
         const videoPlayerContainer = document.createElement('div');
@@ -137,9 +138,9 @@ dropdownContent.addEventListener('mouseleave', function() {
         const deleteButton = document.createElement('button');
         deleteButton.className = 'delete-button';
         deleteButton.innerText = 'Delete';
-deleteButton.onclick = () => {
-    console.log("Attempting to delete video with ID:", video.video_id); // Debug log
-    deleteVideo(video.video_id);
+        deleteButton.onclick = () => {
+        console.log("Attempting to delete video with ID:", video.video_id); // Debug log
+        deleteVideo(video.video_id);
 };
 
         videoItem.appendChild(videoPlayerContainer);
