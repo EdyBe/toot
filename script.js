@@ -1,4 +1,4 @@
-import { updateUser } from './db.js'; // Importing the updateUser function
+
 
 // Function to fetch videos from server based on class codes and school name
 async function fetchVideos() {
