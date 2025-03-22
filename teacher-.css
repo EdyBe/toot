@@ -53,7 +53,7 @@ body {
     box-shadow: 10px 20px 40px rgba(0, 0, 0, 1);
     background-color: rgba(0, 0, 0, 0.5);
     padding: 20px;
-    height: 55%;
+    height: 50%;
     overflow-y: scroll;
 }
 
@@ -230,14 +230,22 @@ header .image {
     z-index: 100;
 }
 
+.responsive-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    object-fit: cover; /* Ensure the video fits properly */
+}
+
+
 /* Media queries for different screen sizes */
 @media (max-width: 768px) {
     .video-player-container {
-    position: relative;
-    padding-top: 56.25%; /* Default to 16:9 aspect ratio */
-    max-height: 200px; /* Limit the height */
-    overflow: hidden; /* Prevent content overflow */
-}
+        padding-top: 75%; /* 4:3 aspect ratio for smaller screens */
+    }
 }
 
 @media (max-width: 480px) {
