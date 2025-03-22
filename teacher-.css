@@ -4,17 +4,13 @@ body {
     background-image: url(./teacher1bg.svg);
     height: 100vh;
     color: white;
-    
 }
 
-
-/* Styles for the Teacher dashboard profile icon */
 .profile-icon { 
     display: flex;
     flex-direction: row; /* Ensure horizontal alignment */
     align-items: center; /* Center items vertically */
     position: relative; /* Set position relative for dropdown positioning */
-    
 }
 
 #firstNameInitial {
@@ -31,7 +27,6 @@ body {
     font-weight: normal;
     margin-left: 10px; /* Add margin to separate from the icon */
 }
-
 
 .search-container {
     margin: 0 50px;
@@ -120,12 +115,9 @@ body {
 
 .video-item iframe {
     width: 100%; /* Set width */
-    height: auto; /* Set height to auto to maintain aspect ratio */
-    max-height: 150px; /* Set a maximum height */
+    height: 150px; /* Set a fixed height to prevent overflow */
     object-fit: cover; /* Ensure the video covers the area without distortion */
 }
-
-
 
 .video-item video {
     width: 100%; /* Set width */
@@ -140,7 +132,7 @@ header {
     position: relative;  /* Ensures absolute positioning works inside */
     padding: 10px;
     margin: 0;
-    }
+}
 
 header .heading {
     position: absolute;  
@@ -149,13 +141,13 @@ header .heading {
     transform: translateX(-50%);  /* Ensures perfect centering */
     font-size: 15px;
     font-weight: bold;
-    
 }
+
 header .image {
     flex-shrink: 0; 
 }
 
-.dropbtn{
+.dropbtn {
     padding: 16px;
     color: white;
     background-color: rgba(0, 0, 0, 0.1);
@@ -166,10 +158,7 @@ header .image {
     border: none;
     border-radius: 30px;
     font-family: Arial, Helvetica, sans-serif;
-
 }
-
-
 
 /* Dropdown styles */
 .dropdown-content {
@@ -201,8 +190,6 @@ header .image {
     border-radius: 10px;
 }
 
-
-
 /* Hover effect for profile elements */
 #firstNameInitial, #firstName {
     cursor: pointer;
@@ -214,34 +201,30 @@ header .image {
     display: block; /* Show dropdown */
 }
 
-.dropdown{
-    /*position: relative;
-    display: inline-block;*/
+.dropdown {
     display: block;
     margin: auto;
-
 }
-
-
 
 .video-item h3, .video-item p {
     word-wrap: break-word; /* Allows long words to be broken and wrap onto the next line */
     overflow-wrap: break-word; /* Ensures that the text will wrap within the container */
     max-width: 100%; /* Ensures the text does not exceed the width of the container */
 }
+
 .new-video-icon {
     position: absolute; /* Positions the icon relative to the nearest positioned ancestor */
     top: 10px; /* Sets the distance from the top of the video item */
     right: 10px; /* Sets the distance from the right side of the video item */
     font-size: 24px; /* Adjusts the size of the icon */
-    color: yellow; /* Sets the color of the icon */ /* does this even do anything? The icon within the code dictates the colour?*/
+    color: yellow; /* Sets the color of the icon */
 }
 
-.download-icon{
+.download-icon {
     color: white;
 }
 
-.download-icon:hover{
+.download-icon:hover {
     color: blue;
 }
 
