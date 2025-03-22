@@ -828,7 +828,7 @@ app.delete('/delete-video', async (req, res) => {
         const { data, error } = await supabase
             .from('videos')
             .delete()
-            .eq('video_id', videoId);
+            .eq('video_id', video_id);
 
         if (error) {
             console.error('Error deleting video from Supabase:', error);
