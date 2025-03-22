@@ -138,8 +138,8 @@ const videoItem = document.createElement('div');
         const deleteButton = document.createElement('button');
         deleteButton.className = 'delete-button';
         deleteButton.innerText = 'Delete';
-        deleteButton.onclick = () => {
-        console.log("Attempting to delete video with ID:", video.video_id); // Debug log
+deleteButton.onclick = () => {
+    console.log("Attempting to delete video with ID:", video._id); // Debug log
         deleteVideo(video.video_id);
 };
 
