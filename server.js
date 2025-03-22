@@ -806,14 +806,14 @@ app.post('/videos/view', async (req, res) => {
 
 // Endpoint to delete a video
 app.delete('/delete-video', async (req, res) => {
-    const videoId = req.query.id; // Get the video ID from the query parameters
+    const videoId = req.query.video._id; // Get the video ID from the query parameters
     if (!videoId) {
         return res.status(400).json({ message: 'Video ID is required' });
     }
 
     try {
         // Delete video from Cloudflare Stream
-        const cloudflareResponse = await axios.delete(`https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_STREAM_ID}/stream/${videoId}`, {
+        const cloudflareResponse = await axios.delete(`https://api.cloudflare.com/client/v4/accounts/${process.env.CLOUDFLARE_STREAM_ID}/stream/${video._id}`, {
             headers: {
                 Authorization: `Bearer ${process.env.CLOUDFLARE_STREAM_TOKEN}`
             }
