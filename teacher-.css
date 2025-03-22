@@ -106,7 +106,23 @@ body {
     display: block;
 }
 
+.video-item {
+    position: relative; /* Set position relative for absolute positioning */
+    border: 2px solid #ccc; /* Adjust the color and thickness as needed */
+    border-radius: 8px; /* Optional: Adds rounded corners */
+    padding: 10px; /* Adds space inside the border */
+    margin: 10px 0; /* Adds space between video items */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: Adds a subtle shadow */
+    color: white;
+    font-family: Arial, Helvetica, sans-serif;
+}
 
+
+.video-item video {
+    width: 100%; /* Set width */
+    height: 150px; /* Set height to match width for square */
+    object-fit: cover; /* Ensure the video covers the area without distortion */
+}
 
 header {
     display: flex;
@@ -220,36 +236,13 @@ header .image {
     color: blue;
 }
 
-/* Style the iframe to fit within the container */
-.responsive-video {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border: none;
-    object-fit: cover; /* Ensure the video fits properly */
-}
-
 /* Optional: Add padding or margins to prevent controls from being cut off */
 .video-item {
-    border: 2px solid #ccc; /* Adjust the color and thickness as needed */
-    border-radius: 8px; /* Optional: Adds rounded corners */
-    padding: 10px; /* Adds space inside the border */
-    margin: 10px 0; /* Adds space between video items */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: Adds a subtle shadow */
-    color: white;
-    font-family: Arial, Helvetica, sans-serif;
-    max-width: 100%; /* Prevent overflow */
-    overflow: hidden; /* Hide overflow */
+    padding: 10px;
+    box-sizing: border-box;
 }
 
 
-.video-item video {
-    width: 100%; /* Set width */
-    height: 150px; /* Set height to match width for square */
-    object-fit: cover; /* Ensure the video covers the area without distortion */
- }
 
 /* Media queries for different screen sizes */
 @media (max-width: 768px) {
