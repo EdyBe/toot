@@ -235,7 +235,7 @@ header .image {
     width: 100%;
     height: 100%;
     border: none;
-    object-fit: cover; /* Ensure the video fits properly */
+    object-fit: contain; /* Ensure the video fits without cropping */
 }
 
 .new-video-icon {
