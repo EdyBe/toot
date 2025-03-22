@@ -232,7 +232,7 @@ header .image {
 
 /* Media queries for different screen sizes */
 @media (max-width: 768px) {
-    ..video-player-container {
+    .video-player-container {
     position: relative;
     padding-top: 56.25%; /* Default to 16:9 aspect ratio */
     max-height: 200px; /* Limit the height */
