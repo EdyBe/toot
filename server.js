@@ -1,5 +1,6 @@
 // Server Configuration and Initialization
-require('dotenv').config(); // Load environment variables from .env file
+import dotenv from 'dotenv';
+dotenv.config(); // Load environment variables from .env file
 const express = require('express'); // Express framework for handling HTTP requests
 const cors = require('cors'); // CORS middleware for cross-origin requests
 const { 
