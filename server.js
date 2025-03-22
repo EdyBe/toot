@@ -1,25 +1,25 @@
 // Server Configuration and Initialization
 import dotenv from 'dotenv';
 dotenv.config(); // Load environment variables from .env file
-const express = require('express'); // Express framework for handling HTTP requests
-const cors = require('cors'); // CORS middleware for cross-origin requests
-const { 
+import express from 'express'; // Express framework for handling HTTP requests
+import cors from 'cors'; // CORS middleware for cross-origin requests
+import { 
     sendPasswordResetEmail, 
     generateResetToken, 
     storeResetToken, 
     validateResetToken, 
     deleteResetToken 
-} = require('./emailService'); // Email service functions for password reset
-const multer = require('multer'); // Middleware for handling file uploads
-const { Server } = require('@tus/server'); // Import TUS server
-const { FileStore } = require('@tus/file-store'); // Import FileStore for TUS
-const fs = require('fs');
-const axios = require('axios'); // Import Axios for making HTTP requests
-const { createClient } = require('@supabase/supabase-js'); // Import Supabase client
-const path = require('path'); // Path module for file path operations
-const bodyParser = require('body-parser');
-const tus = require('tus-js-client');
-const { PassThrough } = require('stream'); // Import stream module
+} from './emailService.js'; // Email service functions for password reset
+import multer from 'multer'; // Middleware for handling file uploads
+import { Server } from '@tus/server'; // Import TUS server
+import { FileStore } from '@tus/file-store'; // Import FileStore for TUS
+import fs from 'fs';
+import axios from 'axios'; // Import Axios for making HTTP requests
+import { createClient } from '@supabase/supabase-js'; // Import Supabase client
+import path from 'path'; // Path module for file path operations
+import bodyParser from 'body-parser';
+import tus from 'tus-js-client';
+import { PassThrough } from 'stream'; // Import stream module
 
 
 
@@ -31,10 +31,10 @@ const uploadMiddleware = multer({ storage: storage });
 // Initialize Supabase client
 
 
-const { supabase } = require('./supabaseClient.js');
+import { supabase } from './supabaseClient.js';
 
 // Database related imports
-const { uploadVideo, createUser, updateUser, readUser } = require('./db.js'); // Import functions from db.js
+import { uploadVideo, createUser, updateUser, readUser } from './db.js'; // Import functions from db.js
 
 // Initialize Express application
 const app = express();
@@ -51,7 +51,7 @@ app.use(cors({
 
 
 // Security and database modules
-const bcrypt = require('bcrypt'); // For password hashing
+import bcrypt from 'bcrypt'; // For password hashing
 
 // Application Configuration
 const validSchoolNames = ["Burnside", "STAC", "School C", "Christ The King", "Test School"]; // List of valid school names
