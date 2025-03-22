@@ -244,7 +244,7 @@ header .image {
     right: 10px;
     font-size: 24px;
     color: yellow;
-
+}
 
 /* Media queries for different screen sizes */
 @media (max-width: 768px) {
