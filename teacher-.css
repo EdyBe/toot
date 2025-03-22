@@ -115,7 +115,16 @@ body {
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: Adds a subtle shadow */
     color: white;
     font-family: Arial, Helvetica, sans-serif;
+    overflow: hidden; /* Prevent overflow */
 }
+
+.video-item iframe {
+    width: 100%; /* Set width */
+    height: auto; /* Set height to auto to maintain aspect ratio */
+    max-height: 150px; /* Set a maximum height */
+    object-fit: cover; /* Ensure the video covers the area without distortion */
+}
+
 
 
 .video-item video {
@@ -235,14 +244,6 @@ header .image {
 .download-icon:hover{
     color: blue;
 }
-
-/* Optional: Add padding or margins to prevent controls from being cut off */
-.video-item {
-    padding: 10px;
-    box-sizing: border-box;
-}
-
-
 
 /* Media queries for different screen sizes */
 @media (max-width: 768px) {
