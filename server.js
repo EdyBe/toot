@@ -806,7 +806,7 @@ app.post('/videos/view', async (req, res) => {
 
 // Endpoint to delete a video
 app.delete('/delete-video', async (req, res) => {
-    const video_id = req.query.video_id; // Get the video ID from the query parameters
+    const video_id = req.query.id; // Get the video ID from the query parameters
     if (!video_id) {
         return res.status(400).json({ message: 'Video ID is required' });
     }
