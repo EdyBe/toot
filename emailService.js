@@ -1,11 +1,11 @@
-const nodemailer = require('nodemailer');
-const crypto = require('crypto');
+import nodemailer 'nodemailer';
+import crypto from 'crypto';
 
 // Store reset tokens with expiration (in memory for demo, use database in production)
 const resetTokens = new Map();
 
 // Generate a secure random token
-function generateResetToken() {
+export function generateResetToken() {
     return crypto.randomBytes(32).toString('hex');
 }
 
@@ -19,7 +19,7 @@ const transporter = nodemailer.createTransport({
 });
 
 // Send password reset email
-async function sendPasswordResetEmail(userEmail, token) {
+export async function sendPasswordResetEmail(userEmail, token) {
     const resetLink = `http://localhost:3000/reset-password.html?token=${token}`;
     
     const mailOptions = {
@@ -69,14 +69,14 @@ async function sendPasswordResetEmail(userEmail, token) {
 }
 
 // Store a reset token with expiration
-function storeResetToken(email, token) {
+export function storeResetToken(email, token) {
     const expiration = Date.now() + 3600000; // 1 hour in milliseconds
     resetTokens.set(token, { email, expiration });
     console.log(`Reset token stored for ${email}`);
 }
 
 // Validate a reset token
-function validateResetToken(token) {
+export function validateResetToken(token) {
     const tokenData = resetTokens.get(token);
     if (!tokenData) {
         return null;
@@ -91,7 +91,7 @@ function validateResetToken(token) {
 }
 
 // Delete a used token
-function deleteResetToken(token) {
+export function deleteResetToken(token) {
     resetTokens.delete(token);
 }
 
