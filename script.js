@@ -218,9 +218,9 @@ if (uploadForm) {
     });
 }
 // Function to delete a video
-function deleteVideo(videoId) {
+function deleteVideo(video) {
     if (confirm("Are you sure you want to delete this video? This action cannot be undone.")) {
-        fetch(`/delete-video?id=${videoId}`, { method: 'DELETE' })
+        fetch(`/delete-video?id=${video._id}`, { method: 'DELETE' })
             .then(response => {
                 if (response.ok) {
                     location.reload(); // Refresh the page to reflect changes
