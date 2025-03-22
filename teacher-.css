@@ -117,12 +117,10 @@ body {
 }
 .video-item iframe {
     width: 100%; /* Full width of the container */
-    height: auto; /* Maintain aspect ratio */
-    max-height: 200px; /* Limit the height */
-    object-fit: cover;
+    height: 100%; /* Fill the height of the container */
+    object-fit: cover; /* Ensure the video fits without distortion */
     margin-bottom: 10px; /* Add spacing below the video */
 }
-
 
 
 header {
@@ -234,9 +232,12 @@ header .image {
 
 /* Media queries for different screen sizes */
 @media (max-width: 768px) {
-    .video-player-container {
-        padding-top: 75%; /* 4:3 aspect ratio for smaller screens */
-    }
+    ..video-player-container {
+    position: relative;
+    padding-top: 56.25%; /* Default to 16:9 aspect ratio */
+    max-height: 200px; /* Limit the height */
+    overflow: hidden; /* Prevent content overflow */
+}
 }
 
 @media (max-width: 480px) {
