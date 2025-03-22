@@ -235,3 +235,24 @@ header .image {
 .download-icon:hover{
     color: blue;
 }
+
+/* Optional: Add padding or margins to prevent controls from being cut off */
+.video-item {
+    padding: 10px;
+    box-sizing: border-box;
+}
+
+
+
+/* Media queries for different screen sizes */
+@media (max-width: 768px) {
+    .video-player-container {
+        padding-top: 75%; /* 4:3 aspect ratio for smaller screens */
+    }
+}
+
+@media (max-width: 480px) {
+    .video-player-container {
+        padding-top: 100%; /* 1:1 aspect ratio for mobile */
+    }
+}
