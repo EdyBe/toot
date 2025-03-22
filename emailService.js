@@ -95,10 +95,4 @@ export function deleteResetToken(token) {
     resetTokens.delete(token);
 }
 
-export {
-    sendPasswordResetEmail,
-    generateResetToken,
-    storeResetToken,
-    validateResetToken,
-    deleteResetToken
-};
+
