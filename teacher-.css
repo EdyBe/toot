@@ -228,6 +228,10 @@ header .image {
     color: blue;
 }
 
+.blueIcon{
+    z-index: 100;
+}
+
 /* Media queries for different screen sizes */
 @media (max-width: 768px) {
     .video-player-container {
