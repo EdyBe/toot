@@ -1,4 +1,4 @@
-import nodemailer 'nodemailer';
+import nodemailer from 'nodemailer';
 import crypto from 'crypto';
 
 // Store reset tokens with expiration (in memory for demo, use database in production)
