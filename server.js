@@ -28,10 +28,9 @@ const uploadMiddleware = multer({ storage: storage });
 
 
 // Initialize Supabase client
-const supabaseUrl = process.env.SUPABASE_URL;
-const supabaseKey = process.env.SUPABASE_KEY;
-const supabase = createClient(supabaseUrl, supabaseKey);
 
+
+const { supabase } = require('./supabaseClient.js');
 
 // Database related imports
 const { uploadVideo, createUser, updateUser, readUser } = require('./db.js'); // Import functions from db.js
