@@ -102,28 +102,28 @@ body {
 }
 
 .video-item {
-    position: relative; /* Set position relative for absolute positioning */
-    border: 2px solid #ccc; /* Adjust the color and thickness as needed */
-    border-radius: 8px; /* Optional: Adds rounded corners */
-    padding: 10px; /* Adds space inside the border */
-    margin: 10px 0; /* Adds space between video items */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: Adds a subtle shadow */
+    display: flex;
+    flex-direction: column; /* Stack children vertically */
+    align-items: flex-start; /* Align metadata to the left */
+    position: relative;
+    border: 2px solid #ccc;
+    border-radius: 8px;
+    padding: 10px;
+    margin: 10px 0;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     color: white;
     font-family: Arial, Helvetica, sans-serif;
-    overflow: hidden; /* Prevent overflow */
+    overflow: hidden;
 }
-
 .video-item iframe {
-    width: 100%; /* Set width */
-    height: 100px; /* Set a shorter fixed height to prevent overflow */
-    object-fit: cover; /* Ensure the video covers the area without distortion */
+    width: 100%; /* Full width of the container */
+    height: auto; /* Maintain aspect ratio */
+    max-height: 200px; /* Limit the height */
+    object-fit: cover;
+    margin-bottom: 10px; /* Add spacing below the video */
 }
 
-.video-item video {
-    width: 100%; /* Set width */
-    height: 150px; /* Set height to match width for square */
-    object-fit: cover; /* Ensure the video covers the area without distortion */
-}
+
 
 header {
     display: flex;
