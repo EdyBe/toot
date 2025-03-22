@@ -217,8 +217,8 @@ if (uploadForm) {
         }
     });
 }
-window.deleteVideo = function (videoId) {
-    fetch(`/delete-video?id-${videoId}`, {
+window.deleteVideo = function (video._id) {
+    fetch(`/delete-video?id-${video._id}`, {
         method: "DELETE",
     })
     .then(response => response.json())
