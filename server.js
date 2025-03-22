@@ -582,7 +582,7 @@ app.get('/user-info', async (req, res) => {
 
 
 // Serve static files from the current directory
-app.use(express.static(__dirname));
+app.use(express.static(path.dirname(new URL(import.meta.url).pathname)));
 
 // Set up a route for the root URL
 app.get('/', (req, res) => {
