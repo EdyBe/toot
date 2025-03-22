@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="account.css">
     <title>Account Page</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 </head>
 <body>
     <heading><h1>My Profile</h1></heading>
@@ -48,7 +49,9 @@
 
 <script>
         // Database related imports
-const { supabase } = require('./server.js'); // Import functions from server.js
+const supabase = supabase.createClient(
+    process.env.SUPABASE_URL, process.env.SUPABASE_KEY
+);
 
     
         // Fetch user information when the page loads
