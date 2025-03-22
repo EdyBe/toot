@@ -1,5 +1,4 @@
-
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'; // Using CDN for the Supabase JS library
+import { createClient } from '@supabase/supabase-js'; // 
 import dotenv from 'dotenv';
 
 // Load environment variables
