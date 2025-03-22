@@ -1,4 +1,4 @@
-const supabase = require('./supabaseClient.js'); // Directly import Supabase client
+import { supabase } from './supabaseClient.js'; // Use ES Module syntax
 // License Key Management System
 const licenseKeyLimits = {
     "BurnsideHighSchool": 4,
