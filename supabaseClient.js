@@ -1,9 +1,5 @@
 import { createClient } from '@supabase/supabase-js';
 
-
-// Import Supabase SDK in a Node.js environment using CommonJS require
-const { createClient } = require('@supabase/supabase-js');
-
 // Initialize Supabase client with environment variables
 const SUPABASE_URL = import.meta.env.SUPABASE_URL;
 const SUPABASE_KEY = import.meta.env.SUPABASE_KEY;
