@@ -238,12 +238,6 @@ p{
     object-fit: cover; /* Ensure the video fits properly */
 }
 
-/* Optional: Add padding or margins to prevent controls from being cut off */
-.video-item {
-    padding: 10px;
-    box-sizing: border-box;
-}
-
 
 
 /* Media queries for different screen sizes */
