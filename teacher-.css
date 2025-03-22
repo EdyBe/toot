@@ -115,7 +115,7 @@ body {
 
 .video-item iframe {
     width: 100%; /* Set width */
-    height: 150px; /* Set a fixed height to prevent overflow */
+    height: 60%; /* Set a fixed height to prevent overflow */
     object-fit: cover; /* Ensure the video covers the area without distortion */
 }
 
