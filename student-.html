@@ -106,9 +106,6 @@ const videoItem = document.createElement('div');
         
 
         const videoPlayer = document.createElement('iframe');
-
-       
-
         videoPlayer.src = `https://iframe.cloudflarestream.com/${video._id}`;
         videoPlayer.style.border = 'none';
         videoPlayer.style.position = 'absolute';
@@ -138,8 +135,8 @@ const videoItem = document.createElement('div');
         const deleteButton = document.createElement('button');
         deleteButton.className = 'delete-button';
         deleteButton.innerText = 'Delete';
-deleteButton.onclick = () => {
-    console.log("Attempting to delete video with ID:", video._id); // Debug log
+        deleteButton.onclick = () => {
+        console.log("Attempting to delete video with ID:", video._id); // Debug log
         deleteVideo(video._id);
 };
 
