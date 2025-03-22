@@ -245,6 +245,11 @@ header .image {
 }
 
 
+.video-item video {
+    width: 100%; /* Set width */
+    height: 150px; /* Set height to match width for square */
+    object-fit: cover; /* Ensure the video covers the area without distortion */
+ }
 
 /* Media queries for different screen sizes */
 @media (max-width: 768px) {
