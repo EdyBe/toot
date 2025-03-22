@@ -7,4 +7,4 @@ const SUPABASE_KEY = process.env.SUPABASE_KEY; // Accessing environment variable
 const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // Export the supabase client for use in other files
-export const supabase = supabase
+export {supabase};
