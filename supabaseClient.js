@@ -1,6 +1,11 @@
-require('dotenv').config();
-const { createClient } = require('@supabase/supabase-js');
 
-const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
+// Load Supabase SDK from CDN
+const { createClient } = supabase;
 
-module.exports = supabase;
+// Initialize Supabase client
+const SUPABASE_URL = "process.env.SUPABASE_URL";
+const SUPABASE_KEY = "process.env.SUPABASE_KEY";
+
+const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
+
+export { supabase };  // Optional: Export if using ES modules
