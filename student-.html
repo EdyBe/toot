@@ -51,7 +51,6 @@
     </button>
     
     <script>
-        
         let currentOpenClassCode = null;
         let currentClassVideos = null;
 
@@ -138,7 +137,7 @@ dropdownContent.addEventListener('mouseleave', function() {
         const deleteButton = document.createElement('button');
         deleteButton.className = 'delete-button';
         deleteButton.innerText = 'Delete';
-        deleteButton.onclick = () => deleteVideo(video._id);
+        deleteButton.onclick = () => deleteVideo(video);
 
         videoItem.appendChild(videoPlayerContainer);
         videoItem.appendChild(title);
@@ -287,6 +286,6 @@ dropdownContent.addEventListener('mouseleave', function() {
                 });
         });
     </script>
-    
+    <script src="script.js" type="module" defer></script>
 </body>
 </html>
