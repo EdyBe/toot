@@ -92,73 +92,80 @@ dropdownContent.addEventListener('mouseleave', function() {
     dropdownContent.style.display = "none";
 });
 
-        function createVideoItem(video, videoFolderContent) {
-            const videoItem = document.createElement('div');
-            videoItem.className = 'video-item';
+       function createVideoItem(video, videoFolderContent) {
+    const videoItem = document.createElement('div');
+    videoItem.className = 'video-item';
 
-            const videoPlayerContainer = document.createElement('div');
-            videoPlayerContainer.style.position = 'relative';
-            videoPlayerContainer.style.paddingTop = '56.25%'; // 16:9 aspect ratio
+    // Create a container for the video player
+    const videoPlayerContainer = document.createElement('div');
+    videoPlayerContainer.style.position = 'relative';
+    videoPlayerContainer.style.paddingTop = '56.25%'; // 16:9 aspect ratio
 
-            const videoPlayer = document.createElement('iframe');
-            videoPlayer.src = `https://iframe.cloudflarestream.com/${video._id}`;
-            videoPlayer.style.border = 'none';
-            videoPlayer.style.position = 'absolute';
-            videoPlayer.style.top = '0';
-            videoPlayer.style.height = '100%';
-            videoPlayer.style.width = '100%';
-            videoPlayer.className = 'responsive-video';
-            videoPlayer.allow = 'autoplay; fullscreen;';
-            videoPlayer.allowFullscreen = true;
+    // Create the iframe for the video
+    const videoPlayer = document.createElement('iframe');
+    videoPlayer.src = `https://iframe.cloudflarestream.com/${video._id}`;
+    videoPlayer.style.border = 'none';
+    videoPlayer.style.position = 'absolute';
+    videoPlayer.style.top = '0';
+    videoPlayer.style.left = '0';
+    videoPlayer.style.width = '100%';
+    videoPlayer.style.height = '100%';
+    videoPlayer.className = 'responsive-video';
+    videoPlayer.allow = 'autoplay; fullscreen;';
+    videoPlayer.allowFullscreen = true;
 
-            videoPlayerContainer.appendChild(videoPlayer);
+    videoPlayerContainer.appendChild(videoPlayer);
 
-            const subject = document.createElement('h3');
-            subject.className = 'video-title';
-            subject.innerText = video.metadata.title;
+    // Create metadata elements
+    const title = document.createElement('h3');
+    title.className = 'video-title';
+    title.innerText = video.metadata.title;
 
-            const emailDisplay = document.createElement('p');
-            emailDisplay.className = 'video-email';
-            emailDisplay.innerText = video.metadata.userEmail;
+    const emailDisplay = document.createElement('p');
+    emailDisplay.className = 'video-email';
+    emailDisplay.innerText = video.metadata.userEmail;
 
-            const blueIcon = document.createElement('span');
-            blueIcon.className = 'new-video-icon';
-            blueIcon.innerText = '🟡';
-            if (!video.metadata.viewed) {
-                videoItem.appendChild(blueIcon);
-            }
+    const viewCount = document.createElement('p');
+    viewCount.className = 'video-views';
+    viewCount.innerText = `Views: ${video.metadata.views || 0}`;
 
-            videoItem.appendChild(videoPlayer);
-            videoItem.appendChild(subject);
-            videoItem.appendChild(emailDisplay);
+    // Add the view icon if the video is not viewed
+    if (!video.metadata.viewed) {
+        const blueIcon = document.createElement('span');
+        blueIcon.className = 'new-video-icon';
+        blueIcon.innerText = '🟡';
+        videoItem.appendChild(blueIcon);
+    }
 
-            const viewCount = document.createElement('p');
-            viewCount.className = 'video-views';
-            viewCount.innerText = `Views: ${video.metadata.views || 0}`;
-            videoItem.appendChild(viewCount);
+    // Append elements to the video item
+    videoItem.appendChild(videoPlayerContainer); // Add the video container
+    videoItem.appendChild(title); // Add the title
+    videoItem.appendChild(emailDisplay); // Add the email
+    videoItem.appendChild(viewCount); // Add the view count
 
-            videoFolderContent.appendChild(videoItem);
+    // Append the video item to the folder content
+    videoFolderContent.appendChild(videoItem);
 
-        videoPlayer.addEventListener('load', () => {
-            // Track video view when player loads
-            fetch('/videos/view', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ id: video._id })
-            })
-            .then(response => response.json())
-            .then(data => {
+    // Track video views when the player loads
+    videoPlayer.addEventListener('load', () => {
+        fetch('/videos/view', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ id: video._id }),
+        })
+            .then((response) => response.json())
+            .then((data) => {
                 if (viewCount) {
                     viewCount.innerText = `Views: ${data.views}`;
                 }
             })
-            .catch(error => {
+            .catch((error) => {
                 console.error('Error tracking video view:', error);
             });
-        });
-        }
+    });
+}
 
         function filterAndDisplayVideos(videos, folderContent, searchTerm = '') {
             folderContent.innerHTML = '';
