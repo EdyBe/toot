@@ -137,7 +137,7 @@ dropdownContent.addEventListener('mouseleave', function() {
         const deleteButton = document.createElement('button');
         deleteButton.className = 'delete-button';
         deleteButton.innerText = 'Delete';
-        deleteButton.onclick = () => deleteVideo(video);
+deleteButton.onclick = () => deleteVideo(video.video_id);
 
         videoItem.appendChild(videoPlayerContainer);
         videoItem.appendChild(title);
