@@ -95,7 +95,7 @@ function deleteResetToken(token) {
     resetTokens.delete(token);
 }
 
-module.exports = {
+export {
     sendPasswordResetEmail,
     generateResetToken,
     storeResetToken,
