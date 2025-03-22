@@ -93,26 +93,23 @@ body {
 }
 
 .folder-content {
-    display: none;
-    padding: 0px 0;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); /* Responsive grid */
+    gap: 10px; /* Space between items */
 }
 
 .folder.active + .folder-content {
     display: block;
 }
-
 .video-item {
-    display: flex;
-    flex-direction: column; /* Stack children vertically */
-    align-items: flex-start; /* Align metadata to the left */
-    position: relative;
-    border: 2px solid #ccc;
-    border-radius: 8px;
-    padding: 10px;
-    margin: 10px 0;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: 2px solid #ccc; /* Add border */
+    border-radius: 8px; /* Rounded corners */
+    padding: 10px; /* Inner padding */
+    margin: 10px 0; /* Space between items */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow */
     color: white;
     font-family: Arial, Helvetica, sans-serif;
+    max-width: 100%; /* Prevent overflow */
     overflow: hidden;
 }
 .video-item iframe {
@@ -205,9 +202,10 @@ header .image {
 }
 
 .video-item h3, .video-item p {
-    word-wrap: break-word; /* Allows long words to be broken and wrap onto the next line */
-    overflow-wrap: break-word; /* Ensures that the text will wrap within the container */
-    max-width: 100%; /* Ensures the text does not exceed the width of the container */
+    word-wrap: break-word; /* Break long words */
+    overflow-wrap: break-word;
+    max-width: 100%; /* Prevent text overflow */
+    margin: 5px 0; /* Add spacing between metadata */
 }
 
 .new-video-icon {
@@ -239,6 +237,13 @@ header .image {
     border: none;
     object-fit: cover; /* Ensure the video fits properly */
 }
+
+.new-video-icon {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 24px;
+    color: yellow;
 
 
 /* Media queries for different screen sizes */
