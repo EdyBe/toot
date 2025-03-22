@@ -1,4 +1,5 @@
-import { createClient } from './node_modules/@supabase/supabase-js/dist/main.js'; // Updated import statement
+
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'; // Using CDN for the Supabase JS library
 import dotenv from 'dotenv';
 
 // Load environment variables
@@ -12,6 +13,5 @@ const supabase = createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // Export the supabase client for use in other files
 export { supabase };
-
 
 
