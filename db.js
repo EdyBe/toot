@@ -1,4 +1,4 @@
-const { supabase } = require('./server.js');
+const { supabase } = require('./supabaseClient.js');
 // License Key Management System
 const licenseKeyLimits = {
     "BurnsideHighSchool": 4,
