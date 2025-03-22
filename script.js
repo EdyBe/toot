@@ -217,19 +217,17 @@ if (uploadForm) {
         }
     });
 }
-// Function to delete a video
-function deleteVideo(video) {
-    if (confirm("Are you sure you want to delete this video? This action cannot be undone.")) {
-        fetch(`/delete-video?id=${video._id}`, { method: 'DELETE' })
-            .then(response => {
-                if (response.ok) {
-                    location.reload(); // Refresh the page to reflect changes
-                } else {
-                    console.error('Failed to delete video');
-                }
-            });
-    }
-}
+window.deleteVideo = function (videoId) {
+    fetch(`/delete-video/${videoId}`, {
+        method: "DELETE",
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data.message);
+        alert("Video deleted successfully!");
+    })
+    .catch(error => console.error("Error deleting video:", error));
+};
 
 // Handle sign-out button if it exists
 const signOutButton = document.getElementById('signOutButton'); // Assuming the button has this ID
