@@ -6,7 +6,42 @@ body {
     color: white;
 }
 
-.profile-icon { 
+.student-folder {
+    margin-left: 20px;
+    background-color: rgba(34, 238, 187, 0.7);
+    width: 50%;
+}
+
+.folder-content {
+    display: none;
+    padding: 0px 0;
+}
+
+.folder.active + .folder-content {
+    display: block;
+}
+
+
+
+.download-icon {
+    color: white;
+}
+
+.download-icon:hover {
+    color: blue;
+}
+
+.blueIcon{
+    z-index: 100;
+}
+
+----------------------------------------------------------
+
+
+
+
+/* Styles for the student dashboard profile icon */
+.profile-icon {
     display: flex;
     flex-direction: row; /* Ensure horizontal alignment */
     align-items: center; /* Center items vertically */
@@ -43,7 +78,7 @@ body {
     font-size: 16px;
     background-color: rgba(255, 255, 255, 0.9);
     box-shadow: 10px 0 40px rgba(0, 0, 0, 1);
-    font-family: Georgia;
+    font-family: Georgia; /*Arial, sans-serif*/
 }
 
 .video-card {
@@ -53,12 +88,12 @@ body {
     box-shadow: 10px 20px 40px rgba(0, 0, 0, 1);
     background-color: rgba(0, 0, 0, 0.5);
     padding: 20px;
-    height: 55%;
+    height: 50%;
     overflow-y: scroll;
 }
 
 .folder {
-    background-color: rgba(34, 238, 187, 0.7);
+    background-color: rgba(34, 238, 187, 0.5);
     border-radius: 5px;
     margin: 10px 0;
     cursor: pointer;
@@ -83,13 +118,7 @@ body {
 }
 
 .folder:hover {
-    background-color: rgba(34, 238, 187, 0.6);
-}
-
-.student-folder {
-    margin-left: 20px;
-    background-color: rgba(34, 238, 187, 0.7);
-    width: 50%;
+    background-color:rgba(34, 238, 187, 0.6);
 }
 
 .folder-content {
@@ -98,32 +127,22 @@ body {
 }
 
 .folder.active + .folder-content {
-    display: block;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+    gap: 10px;
 }
 
 .video-item {
-    display: flex;
-    flex-direction: column; /* Stack children vertically */
-    align-items: flex-start; /* Align metadata to the left */
-    position: relative;
-    border: 2px solid #ccc;
-    border-radius: 8px;
-    padding: 10px;
-    margin: 10px 0;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    border: 2px solid #ccc; /* Adjust the color and thickness as needed */
+    border-radius: 8px; /* Optional: Adds rounded corners */
+    padding: 10px; /* Adds space inside the border */
+    margin: 10px 0; /* Adds space between video items */
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Optional: Adds a subtle shadow */
     color: white;
     font-family: Arial, Helvetica, sans-serif;
-    overflow: hidden;
+    max-width: 100%; /* Prevent overflow */
+    overflow: hidden; /* Hide overflow */
 }
-.video-item iframe {
-    width: 100%; /* Full width of the container */
-    height: auto; /* Maintain aspect ratio */
-    max-height: 200px; /* Limit the height */
-    object-fit: cover;
-    margin-bottom: 10px; /* Add spacing below the video */
-}
-
-
 
 header {
     display: flex;
@@ -137,7 +156,7 @@ header {
 header .heading {
     position: absolute;  
     left: 50%;  
-    top: 0px;
+    top:0px;
     transform: translateX(-50%);  /* Ensures perfect centering */
     font-size: 15px;
     font-weight: bold;
@@ -147,7 +166,7 @@ header .image {
     flex-shrink: 0; 
 }
 
-.dropbtn {
+.dropbtn{
     padding: 16px;
     color: white;
     background-color: rgba(0, 0, 0, 0.1);
@@ -190,7 +209,7 @@ header .image {
     border-radius: 10px;
 }
 
-/* Hover effect for profile elements */
+/* Hover effect for profile icon and heading */
 #firstNameInitial, #firstName {
     cursor: pointer;
 }
@@ -201,10 +220,12 @@ header .image {
     display: block; /* Show dropdown */
 }
 
-.dropdown {
+.dropdown{
     display: block;
     margin: auto;
 }
+
+
 
 .video-item h3, .video-item p {
     word-wrap: break-word; /* Allows long words to be broken and wrap onto the next line */
@@ -212,25 +233,24 @@ header .image {
     max-width: 100%; /* Ensures the text does not exceed the width of the container */
 }
 
-.new-video-icon {
-    position: absolute; /* Positions the icon relative to the nearest positioned ancestor */
-    top: 10px; /* Sets the distance from the top of the video item */
-    right: 10px; /* Sets the distance from the right side of the video item */
-    font-size: 24px; /* Adjusts the size of the icon */
-    color: yellow; /* Sets the color of the icon */
+p{ 
+    font-family: Arial;
 }
 
-.download-icon {
-    color: white;
+
+
+/* Style the iframe to fit within the container */
+.responsive-video {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    object-fit: cover; /* Ensure the video fits properly */
 }
 
-.download-icon:hover {
-    color: blue;
-}
 
-.blueIcon{
-    z-index: 100;
-}
 
 /* Media queries for different screen sizes */
 @media (max-width: 768px) {
